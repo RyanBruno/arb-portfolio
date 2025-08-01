@@ -1,0 +1,35 @@
+# Build artifacts
+/target/
+/debug/
+**/*.rs.bk
+*.pdb
+**/mutants.out*/
+
+# IDEs and editors
+.idea/
+.vscode/
+*~
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Application files
+categories.toml
+config.yml
+log/
+output.csv
+price-cache.json
+tags.toml
+data/
+
+# Additional standard ignores
+.env
+.env.*
+node_modules/
+*.log
+*.tmp
+

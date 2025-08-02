@@ -1,11 +1,32 @@
 use serde::{Serialize, Deserialize};
+use rust_decimal::Decimal;
+
+#[derive(Default)]
+pub enum EventCategory {
+  Swap, // AAVE and Swap
+  Trade, // GMX
+  Transfer, // Transfers
+  Airdrop,
+  #[default]
+  Ignore,
+}
+
+pub struct Event {
+  pub transfer_id: String,
+  pub category: EventCategory,
+  pub transfer: Vec<Transfer>
+}
 
 #[derive(Debug, Serialize)]
 pub struct Transfer {
   pub transfer_id: String,
   pub datetime: String,
   pub asset: String,
-  pub value: String,
+  pub value: Option<Decimal>,
+  #[serde(skip_serializing)]
+  pub from: String,
+  #[serde(skip_serializing)]
+  pub to: String,
 }
 
 #[derive(Debug, Deserialize)]

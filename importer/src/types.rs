@@ -1,6 +1,10 @@
 use serde::{Serialize, Deserialize};
 use rust_decimal::Decimal;
 
+struct TokenMeta {
+  pub address: String,
+  pub category: EventCategory,
+}
 #[derive(Default)]
 pub enum EventCategory {
   Swap, // AAVE and Swap

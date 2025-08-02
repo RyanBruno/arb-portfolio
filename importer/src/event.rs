@@ -21,11 +21,15 @@ impl ToEvents for Vec<Transfer> {
       // Create a Vec of events from the grouped transfers
       events_map
           .into_iter()
-          .map(|(transfer_id, transfer)| Event {
+          .map(|(transfer_id, transfer)| {
+            let category = transfer.iter().map(|x| &x.to).collect::<Vec<&String>>().into();
+            Event {
               transfer_id,
-              category: Default::default(),
+              category,
               transfer,
-          })
+            }
+          }
+          )
           .collect()
     }
 }

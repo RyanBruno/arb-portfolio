@@ -24,7 +24,6 @@ log/
 output.csv
 price-cache.json
 tags.toml
-data/
 
 # Additional standard ignores
 .env

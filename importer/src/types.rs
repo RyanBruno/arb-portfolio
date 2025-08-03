@@ -1,23 +1,24 @@
 use serde::{Serialize, Deserialize};
 use rust_decimal::Decimal;
 
-struct TokenMeta {
-  pub address: String,
-  pub category: EventCategory,
-}
-#[derive(Default)]
+#[derive(Default, Debug, Serialize)]
 pub enum EventCategory {
   Swap, // AAVE and Swap
   Trade, // GMX
   Transfer, // Transfers
   Airdrop,
-  #[default]
+  CostBasis,
   Ignore,
+  #[default]
+  Unknown,
 }
 
+#[derive(Debug, Serialize)]
 pub struct Event {
   pub transfer_id: String,
   pub category: EventCategory,
+  pub tokens: String,
+  #[serde(skip_serializing)]
   pub transfer: Vec<Transfer>
 }
 

@@ -22,14 +22,23 @@ impl ToEvents for Vec<Transfer> {
       events_map
           .into_iter()
           .map(|(transfer_id, transfer)| {
-            let category = transfer.iter().map(|x| &x.to).collect::<Vec<&String>>().into();
+            let category = transfer.iter()
+              .map(|x| vec![&x.to, &x.from])  // Collect both `to` and `from` as a vector of references
+              .flatten()                      // Flatten the nested Vec<Vec<&String>> into a single Vec<&String>
+              .chain(std::iter::once(&transfer_id))
+              .collect::<Vec<&String>>()      // Collect into a Vec<&String>
+              .into();  
+            let tokens = transfer.iter()
+              .map(|x| x.asset.clone())
+              .collect::<Vec<String>>()      // Collect into a Vec<&String>
+              .join("|");
             Event {
               transfer_id,
               category,
+              tokens,
               transfer,
             }
-          }
-          )
+          })
           .collect()
     }
 }

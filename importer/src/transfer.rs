@@ -1,4 +1,4 @@
-use crate::{Transaction, Token, Transfer};
+use crate::{Transaction, Token, Transfer, TokenMeta};
 use csv::Writer;
 use std::error::Error;
 use rust_decimal::Decimal;
@@ -11,7 +11,11 @@ impl From<(&str, Transaction)> for Transfer {
         Transfer {
             transfer_id: tx.txhash,
             datetime: tx.datetime_utc.to_string(),
+            token: TokenMeta {
             asset: "ETH".to_string(),
+            symbol: "ETH".to_string(),
+            //address: "ETH".to_string(),
+            },
             value,
             from: tx.from,
             to: tx.to,
@@ -21,22 +25,26 @@ impl From<(&str, Transaction)> for Transfer {
 
 // Implement From<Token> for Transfer
 impl From<(&str, Token)> for Transfer {
-    fn from((address, token): (&str, Token)) -> Self {
-        let value = match Decimal::from_str(&token.token_value.replace(",", "")) {
-          Ok(value) if token.from.to_lowercase() != address.to_lowercase() => Some(value),
-          Ok(value) if token.from.to_lowercase() == address.to_lowercase() => Some(value * Decimal::from_str("-1").unwrap()),
+    fn from((address, event): (&str, Token)) -> Self {
+        let value = match Decimal::from_str(&event.token_value.replace(",", "")) {
+          Ok(value) if event.from.to_lowercase() != address.to_lowercase() => Some(value),
+          Ok(value) if event.from.to_lowercase() == address.to_lowercase() => Some(value * Decimal::from_str("-1").unwrap()),
           Err(_) => None,
           _ => panic!(),
         };
 
+        let token: TokenMeta = (&event.contract_address).try_into().unwrap_or_default();
+
         Transfer {
-            transfer_id: token.transaction_hash,
-            datetime: token.datetime_utc.to_string(),
-            //asset: token.token_symbol, // TODO Normalize and filter bad assets
-            asset: token.contract_address,
+            transfer_id: event.transaction_hash,
+            datetime: event.datetime_utc.to_string(),
+            token,
+            /*asset: asset.asset,
+            address: event.contract_address,
+            symbol: event.token_symbol,*/
             value,
-            from: token.from,
-            to: token.to,
+            from: event.from,
+            to: event.to,
         }
     }
 }

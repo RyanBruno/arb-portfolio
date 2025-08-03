@@ -4,6 +4,7 @@ pub mod transfer;
 pub use transfer::write_transfers_to_csv;
 pub mod event;
 pub mod category;
+pub mod token;
 
 mod types;
-pub use types::{Transaction, Token, Transfer, Event, EventCategory};
+pub use types::{Transaction, Token, Transfer, Event, EventCategory, TokenMeta};

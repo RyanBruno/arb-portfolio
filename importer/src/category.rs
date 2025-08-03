@@ -15,7 +15,7 @@ type CategoryConfig = HashMap<String, CategoryMapping>;
 impl From<Vec<&String>> for EventCategory {
     fn from(addrs: Vec<&String>) -> Self {
       // Load categories from the TOML file
-      let path = Path::new("categories.toml");
+      let path = Path::new("data/ref/categories.toml");
       let toml_str = fs::read_to_string(path).unwrap();
       let config: CategoryConfig = toml::de::from_str(&toml_str).unwrap();
 
@@ -28,14 +28,12 @@ impl From<Vec<&String>> for EventCategory {
                       "Trade" => return EventCategory::Trade,
                       "Transfer" => return EventCategory::Transfer,
                       "Airdrop" => return EventCategory::Airdrop,
-                      "Cost Basis" => return EventCategory::CostBasis,
                       "Ignore" => return EventCategory::Ignore,
                       _ => panic!(),
                   }
               }
           }
       }
-      println!("{:?}", addrs);
       Default::default()
     }
 }

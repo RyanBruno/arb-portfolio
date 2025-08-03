@@ -7,26 +7,32 @@ pub enum EventCategory {
   Trade, // GMX
   Transfer, // Transfers
   Airdrop,
-  CostBasis,
   Ignore,
   #[default]
   Unknown,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TokenMeta {
+  pub asset: String,
+  pub symbol: String,
+  #[serde(skip_serializing)]
+  pub address: String
 }
 
 #[derive(Debug, Serialize)]
 pub struct Event {
   pub transfer_id: String,
   pub category: EventCategory,
-  pub tokens: String,
   #[serde(skip_serializing)]
-  pub transfer: Vec<Transfer>
+  pub transfer: Vec<Transfer>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct Transfer {
   pub transfer_id: String,
   pub datetime: String,
-  pub asset: String,
+  pub token: TokenMeta,
   pub value: Option<Decimal>,
   #[serde(skip_serializing)]
   pub from: String,

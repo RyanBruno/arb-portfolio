@@ -1,0 +1,271 @@
+["0x9dda6ef3d919c9bc8885d5560999a3640431e8e6"]
+category = "Swap"
+description = "Swap"
+
+["0x63dfa7c09dc2ff4030d6b8dc2ce6262bf898c8a4"]
+category = "Swap"
+description = "AAVE"
+
+["0x794a61358d6845594f94dc1db02a252b5b4814ad"]
+category = "Swap"
+description = "AAVE"
+
+["0xf3c3f14dd7bdb7e03e6ebc3bc5ffc6d66de12251"]
+category = "Swap"
+description = "AAVE"
+
+["0x5283beced7adf6d003225c13896e536f2d4264ff"]
+category = "Swap"
+description = "AAVE"
+
+["0x5760e34c4003752329bc77790b1de44c2799f8c3"]
+category = "Swap"
+description = "AAVE"
+
+["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"]
+category = "Swap"
+description = "AAVE"
+
+["0x900173a66dbd345006c51fa35fa3ab760fcd843b"]
+category = "Trade"
+description = "GMX"
+
+["0x5ac4e27341e4cccb3e5fd62f9e62db2adf43dd57"]
+category = "Trade"
+description = "GMX"
+
+["0x69c527fc77291722b52649e45c838e41be8bf5d5"]
+category = "Trade"
+description = "GMX"
+
+["0x8704ee9ab8622bbc25410c7d4717ed51f776c7f6"]
+category = "Airdrop"
+description = "Airdrop"
+# categories.toml
+
+# Swap category addresses
+["0x0a2854fbbd9b3ef66f17d47284e7f899b9509330"]
+category = "Swap"
+description = "Swap"
+
+["0x724dc807b04555b71ed48a6896b6f41593b8c637"]
+category = "Swap"
+description = "AAVE"
+
+["0x078f358208685046a11c85e8ad32895ded33a249"]
+category = "Swap"
+description = "AAVE"
+
+["0x0000000000000000000000000000000000000000"]
+category = "Swap"
+description = "AAVE"
+
+# Trade category addresses (GMX)
+["0x31ef83a530fde1b38ee9a18093a333d8bbbc40d5"]
+category = "Trade"
+description = "GMX"
+
+["0x70d95587d40a2caf56bd97485ab3eec10bee6336"]
+category = "Trade"
+description = "GMX"
+
+["0x47c031236e19d024b42f8ae6780e44a573170703"]
+category = "Trade"
+description = "GMX"
+
+["0xeb2bb25ddd2b1872d5189ae72fcec9b160dd3fb2"]
+category = "Trade"
+description = "GMX"
+
+["0x09400d9db990d5ed3f35d7be61dfaeb900af03c9"]
+category = "Trade"
+description = "GMX"
+
+["0x7c11f78ce78768518d743e81fdfa2f860c6b9a77"]
+category = "Trade"
+description = "GMX"
+
+["0x0ccb4faa6f1f1b30911619f1184082ab4e25813c"]
+category = "Trade"
+description = "GMX"
+
+# Transfer Transactions
+["0x5598d3b8dddac811218abecceafaa38c1ad1f8528048696715ac09a6ed5c34de"]
+category = "Transfer"
+description = "Transfer"
+
+["0x72fee1683c2ea0e2b5c4d372bacff77dc7edf43651f0e5cd7a0bf696c6aa0b6b"]
+category = "Transfer"
+description = "Transfer"
+
+["0x3a95121e6b9c5c9700badd5fd61b4f7cb182abcc6ab372dc5badb78e5f2fdc6a"]
+category = "Transfer"
+description = "Transfer"
+
+["0x5a7c6971fd2a9ba48cbf4aaec21bb205c9f9f890c06da7593ceede536bad5fcc"]
+category = "Transfer"
+description = "Transfer"
+
+["0xe73778b5206452044c5ddb9e1e1b297d6b7854847148a23e66d3ac60d1537ec2"]
+category = "Transfer"
+description = "Transfer"
+
+["0x45611fb0927d886a65f9443eabf3889c8d3e78c7b97af3d23648aa4f2f6f3493"]
+category = "Transfer"
+description = "Transfer"
+
+["0xcb7b8452adb36c3bd72c926c7cf3f39af2013f3c746cfc999aa8265c61a65407"]
+category = "Transfer"
+description = "Transfer"
+
+["0x6cbe61759d30d252d8a4a8425f1b6d6795ec4306dbd4b1cb2b6056b62a518e20"]
+category = "Transfer"
+description = "Transfer"
+
+["0x380bf73dd9ff4c72d76f398add4ea1294cec6a658678c4e56ce12922f6e4350f"]
+category = "Transfer"
+description = "Transfer"
+
+["0x78053ad0a6b09b3448bb05eeeff9033bd0968d767c15d9b4088d7d2f761228b9"]
+category = "Transfer"
+description = "Transfer"
+
+["0x40cbe0f3b250297e2ba9e4939e7ee345cbd16774b0a9c673c6efc5ee398c8e6a"]
+category = "Transfer"
+description = "Transfer"
+
+["0xad924aa6af899c27de9daa0482c5a5811d2a96c7c50fe8d0f4759247c0b8c28f"]
+category = "Transfer"
+description = "Transfer"
+
+["0x6dff951b39bf42f4ede8e3bff8fa1362182bdb21f5250885ef283f500c36b96a"]
+category = "Transfer"
+description = "Transfer"
+
+["0x7903430031559ff6d842174ec35aa8c4caa59b8cddb66cc3c32886412123fa62"]
+category = "Transfer"
+description = "Transfer"
+
+["0x8dfa7e32d7ce588a2d79a7f354c4cbb3c986bc89aaa8a63849a33061158a01b3"]
+category = "Transfer"
+description = "Transfer"
+
+["0xacdc23008cf7d0384687889e65c5ce1b27362cd7a49419d84140737e9e3c5ed6"]
+category = "Transfer"
+description = "Transfer"
+
+["0x90efb8dd8bb95ecb5500f4ef3ab21578a572986a6fcb536cea7dea37a40027cd"]
+category = "Transfer"
+description = "Transfer"
+
+["0x7af3b1ba7ebd1ce6e1f31da97c8e9a83e1cf11bfe81e0acd02ee72d5088c1bdc"]
+category = "Transfer"
+description = "Transfer"
+
+["0x903dbf6b7dc452540337d9cd9543cdc3fee7eb30aa15b76e3c97325a75a385da"]
+category = "Transfer"
+description = "Transfer"
+
+["0x940b8d0e609f9d3d96a48b31131b0b32dea6517ab01b29035b4ca0e2945ff5e1"]
+category = "Transfer"
+description = "Transfer"
+
+["0xf60704fd18d5059fd258ad6e2a4f72a488c5eb53bc1eae207ac8d49f1bac8d0d"]
+category = "Transfer"
+description = "Transfer"
+
+["0x988079c1b4198adf42a7d34535bf0fdc4d517e77adea403fb16a0e1eecc5803b"]
+category = "Transfer"
+description = "Transfer"
+
+["0x61fc63976f72dfaf0a8255a4ce06cb69a4becf304ec6efd68259bec051cd795c"]
+category = "Transfer"
+description = "Transfer"
+
+["0xfd51360523d84de93615f99bc543ce02b750cf15da8603a575b1af54728af1a3"]
+category = "Transfer"
+description = "Transfer"
+
+["0x6a52b71205a4908ab744b41953bc50aa9fd6d7b15ac3c29002016fbaf1f34ab2"]
+category = "Transfer"
+description = "Transfer"
+
+["0x9fcd7f75b8f620bd1ad161293edff1ba8007f7c957a1b3992c4e9f91cbde8435"]
+category = "Transfer"
+description = "Transfer"
+
+["0x608bce8f0ff3564a1177f220cc622f306f3bc57649577342a01ce5515f887491"]
+category = "Transfer"
+description = "Transfer"
+
+["0x67fb68b6c4fabc5ab1978dd32e66b4c5432ad79b424fc33d41a6439f85a4f226"]
+category = "Transfer"
+description = "Transfer"
+
+["0xa663c20cd3436dc1f323faffcdedbad20fb41aa3eed100afa72343981293d622"]
+category = "Transfer"
+description = "Transfer"
+
+["0x3c6bbd18ebfe2d0b256c475965cc1a32db935718b11963cdbb6ad6d24adbe36e"]
+category = "Ignore"
+description = "Ignore"
+
+["0x89a317364c7d46a84fa8b3e003b931e0235119b4b3243a7960206b97d528f00e"]
+category = "Ignore"
+description = "Ignore"
+
+["0xfbef20f86ac7280bd2e18cf0ba4cb54975439fe97e1b55e990c2d9270ca3603f"]
+category = "Ignore"
+description = "Ignore"
+
+["0x34b28c79e2688c35951f31720a438ef5574166cc49d3d3217f6374dccd610754"]
+category = "Ignore"
+description = "Ignore"
+
+["0x07047061cee7c3c172facf33b168eae1cc3de1601af75614a064f46fb547b7d9"]
+category = "Ignore"
+description = "Ignore"
+
+["0xa9a88fc5eac2134882516a8d8a2486ff72d7eef2380b18ac29b93a0c548ab75d"]
+category = "Ignore"
+description = "Ignore"
+
+["0x666bfc55c2a7a752591230822c4cf498893e874ab87f815432707224cede7c6d"]
+category = "Ignore"
+description = "Ignore"
+
+["0x03ccafef0390d6b06dd4c2ed212515e96604b760e096bce00b38a24085f40dd6"]
+category = "Ignore"
+description = "Ignore"
+
+["0xf0aabfd623482f26ce7e03a625255a59534338fb05b781942b08c0c369338b22"]
+category = "Ignore"
+description = "Ignore"
+
+["0xfc12127df13bb135a009f8253e413e6f0f10f189deb86d9795594b536dc25a7c"]
+category = "Ignore"
+description = "Ignore"
+
+["0x5179a9142d6c50ee3d5ed7942be5e9355e8449992e46e5361d1c3f778ba3710a"]
+category = "Ignore"
+description = "Ignore"
+
+["0x2a57fc745f8d8c4c2e33012ca293f6fec3ff0100bfdd2e2ddbea6a694e346d1f"]
+category = "Ignore"
+description = "Ignore"
+
+["0xd8c5eaf093f98c50af8185e6a50647c5664cd5b62a181d8ad1579c05ee59d278"]
+category = "Ignore"
+description = "Ignore"
+
+["0xbc1c70ff3cc6f641aa7389a08efeb9feccc8a410456413a3be41ccea79cc2f3b"]
+category = "Ignore"
+description = "Ignore"
+
+["0x81ecf5134c01391bea7665be0f2eff5cf5e573340a60945bdf77291752a5d88d"]
+category = "Ignore"
+description = "Ignore"
+
+["0x66249ba5f78cb8af654efec3499f4352b88b5a92020e41d650acdd7d3d101f98"]
+category = "Ignore"
+description = "Ignore"

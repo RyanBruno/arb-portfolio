@@ -24,12 +24,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Reading token data from a CSV file
     let tokens: Vec<Token> = read_csv("data/ingest/tokens.csv")?;
 
-    let mut transfers: Vec<Transfer> = transactions.into_iter().map(|x| (ADDRESS, x).into()).collect();
-    transfers.extend(tokens.into_iter().map(|x| (ADDRESS, x).into()));
-    //let transfers: Vec<Transfer> = tokens.into_iter().map(|x| (ADDRESS, x).into()).collect();
+    /*let mut transfers: Vec<Transfer> = transactions.into_iter().map(|x| (ADDRESS, x).into()).collect();
+    transfers.extend(tokens.into_iter().map(|x| (ADDRESS, x).into()));*/
+    let transfers: Vec<Transfer> = tokens.into_iter().map(|x| (ADDRESS, x).into()).collect();
 
-    let events: Vec<Event> = transfers.to_events();
-    write_csv(&events, "events.csv")?;
+    //let events: Vec<Event> = transfers.to_events();
+    write_csv(&transfers, "transfers.csv")?;
 
     Ok(())
 }

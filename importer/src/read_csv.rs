@@ -1,4 +1,5 @@
 use csv::ReaderBuilder;
+use csv::WriterBuilder;
 use serde::Deserialize;
 use std::error::Error;
 use serde::Serialize;
@@ -29,7 +30,9 @@ where
     T: Serialize, // Ensures that T can be serialized
 {
     // Create a CSV writer
-    let mut wtr = Writer::from_path(file_path)?;
+    let mut wtr = WriterBuilder::new()
+        .has_headers(false)  // Disable headers
+        .from_path(file_path)?;
 
     // Write the data (each element in t)
     for item in t {

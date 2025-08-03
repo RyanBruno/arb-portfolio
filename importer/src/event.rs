@@ -28,14 +28,14 @@ impl ToEvents for Vec<Transfer> {
               .chain(std::iter::once(&transfer_id))
               .collect::<Vec<&String>>()      // Collect into a Vec<&String>
               .into();  
-            let tokens = transfer.iter()
+            /*let tokens = transfer.iter()
               .map(|x| x.asset.clone())
               .collect::<Vec<String>>()      // Collect into a Vec<&String>
-              .join("|");
+              .join("|");*/
             Event {
               transfer_id,
               category,
-              tokens,
+              //tokens,
               transfer,
             }
           })

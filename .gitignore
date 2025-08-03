@@ -18,12 +18,10 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Application files
-categories.toml
 config.yml
 log/
 output.csv
 price-cache.json
-tags.toml
 
 # Additional standard ignores
 .env

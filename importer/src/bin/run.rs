@@ -1,7 +1,10 @@
 use clap::Parser;
 use std::error::Error;
-use arb_portfolio::{Transaction, Token, Transfer, read_csv, write_csv, Event};
-use arb_portfolio::event::ToEvents;
+use arb_portfolio::{
+  Transfer, read_tokens, read_transactions, write_csv, Transaction,
+  TransactionCategory,
+};
+use arb_portfolio::transaction::ToTransaction;
 
 /// Command line arguments for the backend tool
 #[derive(Parser, Debug)]
@@ -19,17 +22,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     log4rs::init_file("log4rs.yml", Default::default()).expect("failed to init logger");
   
     // Reading transaction data from a CSV file
-    let transactions: Vec<Transaction> = read_csv("data/ingest/transactions.csv")?;
+    //let mut transfers: Vec<Transfer> = read_transactions("data/ingest/transactions.csv", ADDRESS)?;
+    let mut transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
 
     // Reading token data from a CSV file
-    let tokens: Vec<Token> = read_csv("data/ingest/tokens.csv")?;
+    //transfers.extend(
 
-    /*let mut transfers: Vec<Transfer> = transactions.into_iter().map(|x| (ADDRESS, x).into()).collect();
-    transfers.extend(tokens.into_iter().map(|x| (ADDRESS, x).into()));*/
-    let transfers: Vec<Transfer> = tokens.into_iter().map(|x| (ADDRESS, x).into()).collect();
+    let transactions: Vec<Transaction> = transfers.to_transaction();
 
-    //let events: Vec<Event> = transfers.to_events();
-    write_csv(&transfers, "transfers.csv")?;
+    let swaps: Vec<Transfer> = transactions.into_iter().filter(|x| x.category == TransactionCategory::Swap)
+      .map(|x| x.transfer)
+      .flatten()
+      .collect();
+
+    write_csv(&swaps, "swaps.csv")?;
 
     Ok(())
 }

@@ -3,7 +3,6 @@ use csv::WriterBuilder;
 use serde::Deserialize;
 use std::error::Error;
 use serde::Serialize;
-use csv::Writer;
 
 /// Generic function to read CSV into a vector of structs.
 pub fn read_csv<T>(file_path: &str) -> Result<Vec<T>, Box<dyn Error>>

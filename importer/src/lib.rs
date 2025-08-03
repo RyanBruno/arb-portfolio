@@ -1,10 +1,14 @@
 mod read_csv;
 pub use read_csv::{read_csv, write_csv};
-pub mod transfer;
-pub use transfer::write_transfers_to_csv;
-pub mod event;
 pub mod category;
 pub mod token;
 
 mod types;
-pub use types::{Transaction, Token, Transfer, Event, EventCategory, TokenMeta};
+pub use types::{Transfer, Transaction, TransactionCategory, Token};
+
+
+pub mod ingest;
+pub use ingest::token::read_tokens;
+pub use ingest::transaction::read_transactions;
+
+pub mod transaction;

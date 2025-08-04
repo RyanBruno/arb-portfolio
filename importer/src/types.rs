@@ -17,6 +17,7 @@ pub struct Transaction {
   pub transfer_id: String,
   pub category: TransactionCategory,
   pub cost_basis: Decimal,
+  pub assets: String,
   #[serde(skip_serializing)]
   pub transfer: Vec<Transfer>,
 }

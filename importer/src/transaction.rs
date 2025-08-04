@@ -1,5 +1,6 @@
 use crate::{Transfer, Transaction};
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 // Implement a custom trait for conversion
 pub trait ToTransaction {
@@ -10,11 +11,6 @@ pub trait ToTransaction {
 impl ToTransaction for Vec<Transfer> {
     fn to_transaction(self) -> Vec<Transaction> {
       let mut transaction_map: HashMap<String, Vec<Transfer>> = HashMap::new();
-
-      let cost_basis = self.iter()
-        .filter(|x| x.token.asset == "USDC")
-        .map(|x| x.value.unwrap_or_default())
-        .sum();
 
       for transfer in self {
           transaction_map
@@ -33,10 +29,23 @@ impl ToTransaction for Vec<Transfer> {
               .chain(std::iter::once(&transfer_id))
               .collect::<Vec<&String>>()      // Collect into a Vec<&String>
               .into();  
+            let mut seen = HashSet::new();
+            let assets = transfer.iter()
+              .filter(|x| (x.token.asset != "USDC" && x.token.asset != "Debt USDC"))
+              .map(|x| x.token.asset.clone())
+              .filter(|x| seen.insert(x.clone()))
+              .collect::<Vec<String>>()      // Collect into a Vec<&String>
+              .join("|");
+            let cost_basis = transfer.iter()
+              .filter(|x| (x.token.asset == "USDC" || x.token.asset == "Debt USDC"))
+              .map(|x| x.value.unwrap_or_default())
+              .sum();
+
             Transaction{
               transfer_id,
               category,
               cost_basis,
+              assets,
               transfer,
             }
           })

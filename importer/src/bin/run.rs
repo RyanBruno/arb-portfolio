@@ -30,12 +30,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let transactions: Vec<Transaction> = transfers.to_transaction();
 
-    let swaps: Vec<Transfer> = transactions.into_iter().filter(|x| x.category == TransactionCategory::Swap)
+    /*let swaps: Vec<Transfer> = transactions.into_iter().filter(|x| x.category == TransactionCategory::Swap)
       .map(|x| x.transfer)
       .flatten()
-      .collect();
+      .collect();*/
 
-    write_csv(&swaps, "swaps.csv")?;
+    write_csv(&transactions, "transactions.csv")?;
 
     Ok(())
 }

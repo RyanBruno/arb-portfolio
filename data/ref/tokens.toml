@@ -1,10 +1,12 @@
 ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
 asset = "USDC"
 symbol = "USDC"
+stable_usd_value = "1"
 
 ["0x724dc807b04555b71ed48a6896b6f41593b8c637"]
 asset = "USDC"
 symbol = "aArbUSDCn"
+stable_usd_value = "1"
 
 ["0x078f358208685046a11c85e8ad32895ded33a249"]
 asset = "WBTC"
@@ -17,6 +19,7 @@ symbol = "WBTC"
 ["0xf611aeb5013fd2c0511c9cd55c7dc5c1140741a6"]
 asset = "Debt USDC"
 symbol = "variableDebtArbUSDC"
+stable_usd_value = "-1"
 
 ["0x92b42c66840c7ad907b4bf74879ff3ef7c529473"]
 asset = "Debt WBTC"
@@ -57,3 +60,7 @@ symbol = "aArbLINK"
 ["0x44705f578135cc5d703b4c9c122528c73eb87145"]
 asset = "Debt ARB"
 symbol = "variableDebtArbARB"
+
+["0x2bcc6d6cdbbdc0a4071e48bb3b969b06b3330c07"]
+asset = "WSOL"
+symbol = "WSOL"

@@ -3,6 +3,8 @@ use std::fs;
 use std::path::Path;
 use std::collections::HashMap;
 use serde::Deserialize;
+use rust_decimal::Decimal;
+use std::str::FromStr;
 
 type TokenConfig = HashMap<String, TokenMeta>;
 
@@ -10,6 +12,7 @@ type TokenConfig = HashMap<String, TokenMeta>;
 pub struct TokenMeta {
   pub asset: String,
   pub symbol: String,
+  pub stable_usd_value: Option<String>,
 }
 
 impl Default for Token {
@@ -18,6 +21,7 @@ impl Default for Token {
         asset: String::from("Unknown"),
         symbol: String::from("Unknown"),
         address: String::from("Unknown"),
+        stable_usd_value: None,
       }
     }
 }
@@ -35,6 +39,7 @@ impl From<&String> for Token {
           asset: meta.asset.clone(),
           symbol: meta.symbol.clone(),
           address: address.to_string(),
+          stable_usd_value: meta.stable_usd_value.as_ref().map(|x| Decimal::from_str(x).unwrap()),
         },
         None => Token {
           address: address.to_string(),

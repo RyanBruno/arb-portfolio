@@ -22,11 +22,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     log4rs::init_file("log4rs.yml", Default::default()).expect("failed to init logger");
   
     // Reading transaction data from a CSV file
-    //let mut transfers: Vec<Transfer> = read_transactions("data/ingest/transactions.csv", ADDRESS)?;
     let mut transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
 
     // Reading token data from a CSV file
-    //transfers.extend(
+    transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
 
     let transactions: Vec<Transaction> = transfers.to_transaction();
 

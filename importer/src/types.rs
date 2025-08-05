@@ -15,9 +15,11 @@ pub enum TransactionCategory {
 #[derive(Debug, Serialize)]
 pub struct Transaction {
   pub transfer_id: String,
+  pub datetime: String,
   pub category: TransactionCategory,
   pub cost_basis: Decimal,
   pub assets: String,
+  pub value: Decimal,
   #[serde(skip_serializing)]
   pub transfer: Vec<Transfer>,
 }
@@ -27,6 +29,7 @@ pub struct Transaction {
 pub struct Token {
   pub asset: String,
   pub symbol: String,
+  pub stable_usd_value: Option<Decimal>,
   #[serde(skip_serializing)]
   pub address: String
 }

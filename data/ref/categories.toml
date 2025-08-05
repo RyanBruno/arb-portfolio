@@ -206,6 +206,14 @@ description = "Transfer"
 category = "Transfer"
 description = "Transfer"
 
+["0x01e6597ff42d5712cea611c4f6acfa10ec3be07e4283d0326951957038c971ac"]
+category = "Transfer"
+description = "Transfer"
+
+["0xfadbdb6120700d161b13ecea95b27df265462dd5457b8066c195aa1548e872a6"]
+category = "Transfer"
+description = "Transfer"
+
 ["0x3c6bbd18ebfe2d0b256c475965cc1a32db935718b11963cdbb6ad6d24adbe36e"]
 category = "Ignore"
 description = "Ignore"

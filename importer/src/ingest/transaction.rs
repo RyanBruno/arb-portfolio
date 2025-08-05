@@ -14,6 +14,7 @@ impl From<(&str, Transaction)> for Transfer {
               asset: "ETH".to_string(),
               symbol: "ETH".to_string(),
               address: "ETH".to_string(),
+              stable_usd_value: None,
             },
             value,
             from: tx.from,

@@ -21,7 +21,7 @@ impl ToTransaction for Vec<Transfer> {
       for transfer in self {
           transaction_map
               .entry(transfer.transfer_id.clone())
-              .or_insert_with(Vec::new)
+              .or_default()
               .push(transfer);
       }
 

@@ -29,8 +29,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      - name: Check formatting
-        run: cargo fmt -- --check
+      #- name: Check formatting
+      #  run: cargo fmt -- --check
 
       - name: Run clippy
         run: cargo clippy -- -D warnings

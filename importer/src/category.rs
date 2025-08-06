@@ -18,7 +18,7 @@ struct CategoryMapping {
 type CategoryConfig = HashMap<String, CategoryMapping>;
 
 /// Determines whether a set of transfers represents a simple two-token swap.
-fn is_simple_swap(transfers: &Vec<Transfer>) -> bool {
+fn is_simple_swap(transfers: &[Transfer]) -> bool {
   transfers.len() == 2 && transfers.iter().filter(|x| x.token.stable_usd_value.is_some()).count() == 1
 }
 
@@ -33,8 +33,7 @@ impl From<&Vec<Transfer>> for TransactionCategory {
 
       let category: Option<&CategoryMapping> = transfers
         .iter()
-        .map(|x| vec![&x.transfer_id, &x.counterparty])
-        .flatten()
+        .flat_map(|x| vec![&x.transfer_id, &x.counterparty])
         .find_map(|key| config.get(key));
 
       match category.map(|x| x.category.as_str()) {

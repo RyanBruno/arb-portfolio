@@ -9,14 +9,18 @@ use std::str::FromStr;
 /// Converts a raw CSV token transfer and the account address into a normalized [`Transfer`].
 impl From<(&str, Token)> for Transfer {
     fn from((address, event): (&str, Token)) -> Self {
-        let value = match Decimal::from_str(&event.token_value.replace(",", "")) {
-          Ok(value) if event.from.to_lowercase() != address.to_lowercase() => Some(value),
-          Ok(value) if event.from.to_lowercase() == address.to_lowercase() => Some(value * Decimal::from_str("-1").unwrap()),
-          Err(_) => None,
+        let token_value_raw = Decimal::from_str(&event.token_value.replace(",", ""));
+        let usd_value_raw = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", ""));
+        let neg_one = Decimal::from_str("-1").unwrap();
+
+        let (value, usd_value) = match (token_value_raw, usd_value_raw) {
+          (Ok(value), Ok(usd_value)) if event.from.to_lowercase() != address.to_lowercase() => (Some(value), Some(usd_value)),
+          (Ok(value), Ok(usd_value)) if event.from.to_lowercase() == address.to_lowercase() => (Some(value * neg_one), Some(usd_value * neg_one)),
+          (Ok(value), _) if event.from.to_lowercase() != address.to_lowercase() => (Some(value), None),
+          (Ok(value), _) if event.from.to_lowercase() == address.to_lowercase() => (Some(value * neg_one), None),
+          (Err(_), _) => (None, None),
           _ => panic!(),
         };
-
-        let usd_value = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", "")).ok();
 
         let token: TokenMeta = (&event.contract_address).into();
 

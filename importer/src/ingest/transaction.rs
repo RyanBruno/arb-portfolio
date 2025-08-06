@@ -1,9 +1,12 @@
-use serde::{Deserialize};
-use crate::{Transfer, Token, read_csv};
+//! Functions for ingesting normal transaction CSVs exported from Etherscan.
+
+use serde::Deserialize;
+use crate::{read_csv, Token, Transfer};
 use rust_decimal::Decimal;
 use std::error::Error;
 use std::str::FromStr;
 
+/// Converts a CSV transaction row into a [`Transfer`] capturing its ETH movement.
 impl From<(&str, Transaction)> for Transfer {
     fn from((_address, tx): (&str, Transaction)) -> Self {
         let value = Decimal::from_str(&tx.value_in_eth).ok();
@@ -23,12 +26,15 @@ impl From<(&str, Transaction)> for Transfer {
     }
 }
 
+/// Reads a transaction CSV and converts each row into a [`Transfer`] for the
+/// supplied address.
 pub fn read_transactions(file_path: &str, address: &'static str) -> Result<Vec<Transfer>, Box<dyn Error>> {
     Ok(read_csv::<Transaction>(file_path)?.into_iter().map(|x| (address, x).into()).collect())
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+/// Raw representation of an Etherscan transaction export.
 pub struct Transaction {
     #[serde(rename = "Txhash")]
     pub txhash: String,

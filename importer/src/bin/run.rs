@@ -1,7 +1,9 @@
+//! Command line interface for converting raw CSV exports into normalized transactions.
+
 use clap::Parser;
 use std::error::Error;
 use arb_portfolio::{
-  Transfer, read_tokens, read_transactions, write_csv, Transaction,
+  read_tokens, read_transactions, write_csv, Transaction, Transfer,
 };
 use arb_portfolio::transaction::ToTransaction;
 
@@ -16,6 +18,7 @@ struct Args {
 
 const ADDRESS: &str = "0x0A8Dd68E974C371A6a6Efe95cfA22a200eb7AfCc";
 
+/// Runs the importer CLI.
 fn main() -> Result<(), Box<dyn Error>> {
     // initialize logging from log4rs config file
     log4rs::init_file("log4rs.yml", Default::default()).expect("failed to init logger");

@@ -1,15 +1,19 @@
-use crate::{Transfer, Transaction, TransactionCategory};
+//! Conversion logic for grouping raw [`Transfer`]s into higher level [`Transaction`] records.
+
+use crate::{Transaction, TransactionCategory, Transfer};
 use std::collections::HashMap;
 use std::collections::HashSet;
-use rust_decimal::Decimal;
 use std::str::FromStr;
 
-// Implement a custom trait for conversion
+use rust_decimal::Decimal;
+
+/// Convert intermediate types into a collection of [`Transaction`]s.
 pub trait ToTransaction {
+    /// Consumes the implementor and returns a set of [`Transaction`] values.
     fn to_transaction(self) -> Vec<Transaction>;
 }
 
-// Implement From<Transaction> for Transfer
+/// Groups a list of [`Transfer`]s by their identifier to build [`Transaction`]s.
 impl ToTransaction for Vec<Transfer> {
     fn to_transaction(self) -> Vec<Transaction> {
       let mut transaction_map: HashMap<String, Vec<Transfer>> = HashMap::new();

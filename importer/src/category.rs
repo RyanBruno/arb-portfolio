@@ -1,21 +1,29 @@
-use crate::{TransactionCategory, SwapSubCategory, Transfer};
+//! Utilities for classifying transfers into [`TransactionCategory`] values.
+
+use crate::{SwapSubCategory, TransactionCategory, Transfer};
+use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+
 use serde::Deserialize;
-use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
+/// Mapping of identifiers to known transaction categories.
 struct CategoryMapping {
     pub category: String,
     //pub description: String,
 }
 
+/// Convenience alias for the category configuration file.
 type CategoryConfig = HashMap<String, CategoryMapping>;
 
+/// Determines whether a set of transfers represents a simple two-token swap.
 fn is_simple_swap(transfers: &Vec<Transfer>) -> bool {
   transfers.len() == 2 && transfers.iter().filter(|x| x.token.stable_usd_value.is_some()).count() == 1
 }
 
+/// Derives a [`TransactionCategory`] for a group of transfers by consulting
+/// `data/ref/categories.toml` and falling back to heuristics when needed.
 impl From<&Vec<Transfer>> for TransactionCategory {
     fn from(transfers: &Vec<Transfer>) -> Self {
       // Load categories from the TOML file
@@ -23,11 +31,12 @@ impl From<&Vec<Transfer>> for TransactionCategory {
       let toml_str = fs::read_to_string(path).unwrap();
       let config: CategoryConfig = toml::de::from_str(&toml_str).unwrap();
 
-      let category: Option<&CategoryMapping> = transfers.iter()
+      let category: Option<&CategoryMapping> = transfers
+        .iter()
         .map(|x| vec![&x.transfer_id, &x.to, &x.from])
         .flatten()
         .find_map(|key| config.get(key));
-      
+
       match category.map(|x| x.category.as_str()) {
           Some("Swap") if is_simple_swap(transfers) => TransactionCategory::Swap(SwapSubCategory::Simple),
           Some("Swap") => TransactionCategory::Swap(Default::default()),

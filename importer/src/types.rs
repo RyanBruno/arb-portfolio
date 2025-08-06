@@ -55,7 +55,7 @@ pub struct Transaction {
   pub n: usize,
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, PartialEq)]
 /// Normalized representation of an ERC-20 token.
 pub struct Token {
   /// Human readable name of the asset.

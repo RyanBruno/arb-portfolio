@@ -2,7 +2,6 @@ use clap::Parser;
 use std::error::Error;
 use arb_portfolio::{
   Transfer, read_tokens, read_transactions, write_csv, Transaction,
-  TransactionCategory,
 };
 use arb_portfolio::transaction::ToTransaction;
 
@@ -25,7 +24,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
 
     // Reading token data from a CSV file
-    transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
+    //transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
 
     let transactions: Vec<Transaction> = transfers.to_transaction();
 

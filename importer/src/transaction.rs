@@ -1,4 +1,4 @@
-use crate::{Transfer, Transaction};
+use crate::{Transfer, Transaction, TransactionCategory};
 use std::collections::HashMap;
 use std::collections::HashSet;
 use rust_decimal::Decimal;
@@ -28,12 +28,14 @@ impl ToTransaction for Vec<Transfer> {
             let datetime = transfer.first().unwrap().datetime.clone();
             let transfer: Vec<Transfer> = transfer.into_iter()
               .filter(|x| x.value.is_some() && x.value.unwrap() != Decimal::from_str("0").unwrap()).collect();
-            let category = transfer.iter()
+            /*let category = transfer.iter()
               .map(|x| vec![&x.to, &x.from])  // Collect both `to` and `from` as a vector of references
               .flatten()                      // Flatten the nested Vec<Vec<&String>> into a single Vec<&String>
               .chain(std::iter::once(&transfer_id))
               .collect::<Vec<&String>>()      // Collect into a Vec<&String>
-              .into();  
+              .into();  */
+            let category: TransactionCategory = (&transfer).into();
+
             let mut seen = HashSet::new();
             let assets = transfer.iter()
               .filter(|x| x.token.stable_usd_value.is_none())
@@ -59,6 +61,7 @@ impl ToTransaction for Vec<Transfer> {
               cost_basis,
               assets,
               value,
+              n: transfer.len(),
               transfer,
             }
           })

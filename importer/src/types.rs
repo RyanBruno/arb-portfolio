@@ -2,8 +2,16 @@ use serde::Serialize;
 use rust_decimal::Decimal;
 
 #[derive(Default, Debug, Serialize, PartialEq)]
+pub enum SwapSubCategory {
+  Simple, // Single Asset, Single USD(C)
+  MultiAsset, // Multi Asset, No USD(C)
+  #[default]
+  UnknownSwap,
+}
+
+#[derive(Default, Debug, Serialize, PartialEq)]
 pub enum TransactionCategory {
-  Swap, // AAVE and Swap
+  Swap(SwapSubCategory), // AAVE and Swap
   Trade, // GMX
   Transfer, // Transfers
   Airdrop,
@@ -22,6 +30,7 @@ pub struct Transaction {
   pub value: Decimal,
   #[serde(skip_serializing)]
   pub transfer: Vec<Transfer>,
+  pub n: usize,
 }
 
 

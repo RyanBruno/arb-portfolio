@@ -4,7 +4,7 @@ pub mod category;
 pub mod token;
 
 mod types;
-pub use types::{Transfer, Transaction, TransactionCategory, Token};
+pub use types::{Transfer, Transaction, TransactionCategory, SwapSubCategory, Token};
 
 
 pub mod ingest;

@@ -1,4 +1,4 @@
-use crate::{TransactionCategory};
+use crate::{TransactionCategory, SwapSubCategory, Transfer};
 use std::fs;
 use std::path::Path;
 use serde::Deserialize;
@@ -12,7 +12,36 @@ struct CategoryMapping {
 
 type CategoryConfig = HashMap<String, CategoryMapping>;
 
-impl From<Vec<&String>> for TransactionCategory {
+fn is_simple_swap(transfers: &Vec<Transfer>) -> bool {
+  transfers.len() == 2 && transfers.iter().filter(|x| x.token.stable_usd_value.is_some()).count() == 1
+}
+
+impl From<&Vec<Transfer>> for TransactionCategory {
+    fn from(transfers: &Vec<Transfer>) -> Self {
+      // Load categories from the TOML file
+      let path = Path::new("data/ref/categories.toml");
+      let toml_str = fs::read_to_string(path).unwrap();
+      let config: CategoryConfig = toml::de::from_str(&toml_str).unwrap();
+
+      let category: Option<&CategoryMapping> = transfers.iter()
+        .map(|x| vec![&x.transfer_id, &x.to, &x.from])
+        .flatten()
+        .find_map(|key| config.get(key));
+      
+      match category.map(|x| x.category.as_str()) {
+          Some("Swap") if is_simple_swap(transfers) => TransactionCategory::Swap(SwapSubCategory::Simple),
+          Some("Swap") => TransactionCategory::Swap(Default::default()),
+          Some("Trade") => TransactionCategory::Trade,
+          Some("Transfer") => TransactionCategory::Transfer,
+          Some("Airdrop") => TransactionCategory::Airdrop,
+          Some("Ignore") => TransactionCategory::Ignore,
+          None => TransactionCategory::Unknown,
+          _ => panic!(),
+      }
+    }
+}
+
+/*impl From<Vec<&String>> for TransactionCategory {
     fn from(addrs: Vec<&String>) -> Self {
       // Load categories from the TOML file
       let path = Path::new("data/ref/categories.toml");
@@ -36,4 +65,4 @@ impl From<Vec<&String>> for TransactionCategory {
       }
       Default::default()
     }
-}
+}*/

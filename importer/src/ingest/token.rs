@@ -1,8 +1,8 @@
 //! Functions for ingesting token transfer CSVs exported from Etherscan.
 
-use serde::Deserialize;
 use crate::{read_csv, Token as TokenMeta, Transfer};
 use rust_decimal::Decimal;
+use serde::Deserialize;
 use std::error::Error;
 use std::str::FromStr;
 
@@ -11,18 +11,31 @@ impl From<(&str, Token)> for Transfer {
     fn from((address, event): (&str, Token)) -> Self {
         let token_value_raw = Decimal::from_str(&event.token_value.replace(",", ""));
         let usd_value_raw = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", ""));
+
         let neg_one = Decimal::from_str("-1").unwrap();
 
-        let (value, usd_value) = match (token_value_raw, usd_value_raw) {
-          (Ok(value), Ok(usd_value)) if event.from.to_lowercase() != address.to_lowercase() => (Some(value), Some(usd_value)),
-          (Ok(value), Ok(usd_value)) if event.from.to_lowercase() == address.to_lowercase() => (Some(value * neg_one), Some(usd_value * neg_one)),
-          (Ok(value), _) if event.from.to_lowercase() != address.to_lowercase() => (Some(value), None),
-          (Ok(value), _) if event.from.to_lowercase() == address.to_lowercase() => (Some(value * neg_one), None),
-          (Err(_), _) => (None, None),
-          _ => panic!(),
+        let (value, mut usd_value) = match (token_value_raw, usd_value_raw) {
+            (Ok(value), Ok(usd_value)) if event.from.to_lowercase() != address.to_lowercase() => {
+                (Some(value), Some(usd_value))
+            }
+            (Ok(value), Ok(usd_value)) if event.from.to_lowercase() == address.to_lowercase() => {
+                (Some(value * neg_one), Some(usd_value * neg_one))
+            }
+            (Ok(value), _) if event.from.to_lowercase() != address.to_lowercase() => {
+                (Some(value), None)
+            }
+            (Ok(value), _) if event.from.to_lowercase() == address.to_lowercase() => {
+                (Some(value * neg_one), None)
+            }
+            (Err(_), _) => (None, None),
+            _ => panic!(),
         };
 
         let token: TokenMeta = (&event.contract_address).into();
+
+        if let (Some(stable), Some(amount)) = (token.stable_usd_value, value) {
+            usd_value = Some(amount * stable);
+        }
 
         let counterparty = if event.from.to_lowercase() == address.to_lowercase() {
             event.to.clone()
@@ -46,8 +59,14 @@ impl From<(&str, Token)> for Transfer {
 
 /// Reads a token transfer CSV and converts each row into a [`Transfer`] for the
 /// provided address.
-pub fn read_tokens(file_path: &str, address: &'static str) -> Result<Vec<Transfer>, Box<dyn Error>> {
-    Ok(read_csv::<Token>(file_path)?.into_iter().map(|x| (address, x).into()).collect())
+pub fn read_tokens(
+    file_path: &str,
+    address: &'static str,
+) -> Result<Vec<Transfer>, Box<dyn Error>> {
+    Ok(read_csv::<Token>(file_path)?
+        .into_iter()
+        .map(|x| (address, x).into())
+        .collect())
 }
 
 #[derive(Debug, Deserialize)]

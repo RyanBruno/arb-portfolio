@@ -29,7 +29,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Reading token data from a CSV file
     //transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
 
-    let transactions: Vec<Transaction> = transfers.to_transaction();
+    let transactions: Vec<Transaction> = transfers.clone().to_transaction();
 
     /*let swaps: Vec<Transfer> = transactions.into_iter().filter(|x| x.category == TransactionCategory::Swap)
       .map(|x| x.transfer)
@@ -37,6 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
       .collect();*/
 
     write_csv(&transactions, "transactions.csv")?;
+    write_csv(&transfers, "transfers.csv")?;
 
     Ok(())
 }

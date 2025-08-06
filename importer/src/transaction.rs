@@ -30,10 +30,6 @@ impl ToTransaction for Vec<Transfer> {
           .into_iter()
           .map(|(transfer_id, transfer)| {
             let datetime = transfer.first().unwrap().datetime.clone();
-            let transfer: Vec<Transfer> = transfer
-              .into_iter()
-              .filter(|x| x.value.is_some() && x.value.unwrap() != Decimal::from_str("0").unwrap())
-              .collect();
 
             // Combine transfers that are equal ignoring value to compute net transfers
             let mut net_transfers: Vec<Transfer> = Vec::new();

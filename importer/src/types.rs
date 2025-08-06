@@ -69,7 +69,7 @@ pub struct Token {
   pub address: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 /// Individual movement of a token value between two addresses.
 pub struct Transfer {
   /// Unique identifier used to group related transfers.

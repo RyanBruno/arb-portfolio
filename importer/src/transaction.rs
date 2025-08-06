@@ -30,8 +30,27 @@ impl ToTransaction for Vec<Transfer> {
           .into_iter()
           .map(|(transfer_id, transfer)| {
             let datetime = transfer.first().unwrap().datetime.clone();
-            let transfer: Vec<Transfer> = transfer.into_iter()
-              .filter(|x| x.value.is_some() && x.value.unwrap() != Decimal::from_str("0").unwrap()).collect();
+            let transfer: Vec<Transfer> = transfer
+              .into_iter()
+              .filter(|x| x.value.is_some() && x.value.unwrap() != Decimal::from_str("0").unwrap())
+              .collect();
+
+            // Combine transfers that are equal ignoring value to compute net transfers
+            let mut net_transfers: Vec<Transfer> = Vec::new();
+            for t in transfer.into_iter() {
+              if let Some(existing) = net_transfers.iter_mut().find(|e| *e == &t) {
+                let sum = existing.value.unwrap_or_default() + t.value.unwrap_or_default();
+                existing.value = Some(sum);
+              } else {
+                net_transfers.push(t);
+              }
+            }
+            // Remove any transfers that net to zero before classification
+            let transfer: Vec<Transfer> = net_transfers
+              .into_iter()
+              .filter(|x| x.value.unwrap_or_default() != Decimal::from_str("0").unwrap())
+              .collect();
+
             /*let category = transfer.iter()
               .map(|x| vec![&x.to, &x.from])  // Collect both `to` and `from` as a vector of references
               .flatten()                      // Flatten the nested Vec<Vec<&String>> into a single Vec<&String>

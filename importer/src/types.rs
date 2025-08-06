@@ -82,6 +82,8 @@ pub struct Transfer {
   pub value: Option<Decimal>,
   /// USD value of the transfer at the time of the transaction.
   pub usd_value: Option<Decimal>,
+  /// Address on the other side of the transfer relative to the observed account.
+  pub counterparty: String,
   /// Sender address.
   #[serde(skip_serializing)]
   pub from: String,

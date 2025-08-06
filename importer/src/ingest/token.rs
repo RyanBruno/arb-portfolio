@@ -16,6 +16,8 @@ impl From<(&str, Token)> for Transfer {
           _ => panic!(),
         };
 
+        let usd_value = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", "")).ok();
+
         let token: TokenMeta = (&event.contract_address).into();
 
         Transfer {
@@ -26,6 +28,7 @@ impl From<(&str, Token)> for Transfer {
             address: event.contract_address,
             symbol: event.token_symbol,*/
             value,
+            usd_value,
             from: event.from,
             to: event.to,
         }

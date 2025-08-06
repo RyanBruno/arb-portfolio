@@ -10,6 +10,7 @@ use std::str::FromStr;
 impl From<(&str, Transaction)> for Transfer {
     fn from((_address, tx): (&str, Transaction)) -> Self {
         let value = Decimal::from_str(&tx.value_in_eth).ok();
+        let usd_value = Decimal::from_str(&tx.current_value).ok();
         Transfer {
             transfer_id: tx.txhash,
             datetime: tx.datetime_utc.to_string(),
@@ -20,6 +21,7 @@ impl From<(&str, Transaction)> for Transfer {
               stable_usd_value: None,
             },
             value,
+            usd_value,
             from: tx.from,
             to: tx.to,
         }

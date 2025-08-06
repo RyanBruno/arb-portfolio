@@ -80,6 +80,8 @@ pub struct Transfer {
   pub token: Token,
   /// Amount of token moved, positive for incoming and negative for outgoing.
   pub value: Option<Decimal>,
+  /// USD value of the transfer at the time of the transaction.
+  pub usd_value: Option<Decimal>,
   /// Sender address.
   #[serde(skip_serializing)]
   pub from: String,

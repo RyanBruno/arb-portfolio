@@ -50,9 +50,7 @@ pub struct Transaction {
   pub value: Decimal,
   /// Source transfers that compose this transaction.
   #[serde(skip_serializing)]
-  pub transfer: Vec<Transfer>,
-  /// Number of individual transfers contained.
-  pub n: usize,
+  pub net_transfers: Vec<Transfer>,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq)]

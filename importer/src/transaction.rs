@@ -28,12 +28,11 @@ impl ToTransaction for Vec<Transfer> {
       // Create a Vec of transaction from the grouped transfers
       transaction_map
           .into_iter()
-          .map(|(transfer_id, transfer)| {
-            let datetime = transfer.first().unwrap().datetime.clone();
+          .map(|(transfer_id, transfers)| {
 
             // Combine transfers that are equal ignoring value to compute net transfers
             let mut net_transfers: Vec<Transfer> = Vec::new();
-            for t in transfer.into_iter() {
+            for t in transfers.into_iter() {
               if let Some(existing) = net_transfers.iter_mut().find(|e| *e == &t) {
                 let sum = existing.value.unwrap_or_default() + t.value.unwrap_or_default();
                 existing.value = Some(sum);
@@ -42,37 +41,28 @@ impl ToTransaction for Vec<Transfer> {
               }
             }
             // Remove any transfers that net to zero before classification
-            let transfer: Vec<Transfer> = net_transfers
+            let net_transfers: Vec<Transfer> = net_transfers
               .into_iter()
               .filter(|x| x.value.unwrap_or_default() != Decimal::from_str("0").unwrap())
               .collect();
 
-            /*let category = transfer.iter()
-              .map(|x| vec![&x.to, &x.from])  // Collect both `to` and `from` as a vector of references
-              .flatten()                      // Flatten the nested Vec<Vec<&String>> into a single Vec<&String>
-              .chain(std::iter::once(&transfer_id))
-              .collect::<Vec<&String>>()      // Collect into a Vec<&String>
-              .into();  */
-            let category: TransactionCategory = (&transfer).into();
+            let datetime = net_transfers.first().unwrap().datetime.clone();
+            let category: TransactionCategory = (&net_transfers).into();
 
             let mut seen = HashSet::new();
-            let assets = transfer.iter()
+            let assets = net_transfers.iter()
               .filter(|x| x.token.stable_usd_value.is_none())
               .map(|x| x.token.asset.clone())
               .filter(|x| seen.insert(x.clone()))
               .collect::<Vec<String>>()      // Collect into a Vec<&String>
               .join("|");
 
-            let value = transfer.iter()
+            let value = net_transfers.iter()
               .filter(|x| x.token.stable_usd_value.is_none())
               .map(|x| x.value.unwrap_or_default())
               .sum();
 
-            /*let cost_basis = transfer.iter()
-              .filter_map(|x| x.token.stable_usd_value.map(|y| (x.value.unwrap_or_default(), y)))
-              .map(|(x, y)| x * y)
-              .sum();*/
-            let (cost_basis, c) = transfer.iter()
+            let (cost_basis, c) = net_transfers.iter()
               .filter_map(|x| x.usd_value)
               .fold((Decimal::ZERO, 0u32), |(s, c), x| (s + x, c + 1));
 
@@ -89,8 +79,7 @@ impl ToTransaction for Vec<Transfer> {
               cost_basis: cost_basis.unwrap_or_default(),
               assets,
               value,
-              n: transfer.len(),
-              transfer,
+              net_transfers,
             }
           })
           .collect()

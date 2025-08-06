@@ -33,7 +33,7 @@ impl From<(&str, Token)> for Transfer {
 
         let token: TokenMeta = (&event.contract_address).into();
 
-        if let (Some(stable), Some(amount)) = (token.stable_usd_value.clone(), value) {
+        if let (Some(stable), Some(amount)) = (token.stable_usd_value, value) {
             usd_value = Some(amount * stable);
         }
 

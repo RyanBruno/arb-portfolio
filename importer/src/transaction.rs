@@ -68,16 +68,25 @@ impl ToTransaction for Vec<Transfer> {
               .map(|x| x.value.unwrap_or_default())
               .sum();
 
-            let cost_basis = transfer.iter()
+            /*let cost_basis = transfer.iter()
               .filter_map(|x| x.token.stable_usd_value.map(|y| (x.value.unwrap_or_default(), y)))
               .map(|(x, y)| x * y)
-              .sum();
+              .sum();*/
+            let (cost_basis, c) = transfer.iter()
+              .filter_map(|x| x.usd_value)
+              .fold((Decimal::ZERO, 0u32), |(s, c), x| (s + x, c + 1));
+
+            let cost_basis = if c > 0 {
+              Some(cost_basis / Decimal::from(c))
+            } else {
+              None
+            };
 
             Transaction {
               transfer_id,
               datetime,
               category,
-              cost_basis,
+              cost_basis: cost_basis.unwrap_or_default(),
               assets,
               value,
               n: transfer.len(),

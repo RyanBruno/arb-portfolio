@@ -40,8 +40,6 @@ impl From<(&str, Token)> for Transfer {
             value,
             usd_value,
             counterparty,
-            from: event.from,
-            to: event.to,
         }
     }
 }

@@ -36,8 +36,6 @@ impl From<(&str, Transaction)> for Transfer {
             value,
             usd_value,
             counterparty,
-            from: tx.from,
-            to: tx.to,
         }
     }
 }

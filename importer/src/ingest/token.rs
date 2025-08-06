@@ -10,8 +10,8 @@ use std::str::FromStr;
 impl From<(&str, Token)> for Transfer {
     fn from((address, event): (&str, Token)) -> Self {
         let token_value_raw = Decimal::from_str(&event.token_value.replace(",", ""));
-        let usd_value_raw =
-            Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", ""));
+        let usd_value_raw = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", ""));
+
         let neg_one = Decimal::from_str("-1").unwrap();
 
         let (value, mut usd_value) = match (token_value_raw, usd_value_raw) {

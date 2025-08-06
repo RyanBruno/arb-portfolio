@@ -1,9 +1,12 @@
-use serde::{Deserialize};
-use crate::{Transfer, Token as TokenMeta, read_csv};
+//! Functions for ingesting token transfer CSVs exported from Etherscan.
+
+use serde::Deserialize;
+use crate::{read_csv, Token as TokenMeta, Transfer};
 use rust_decimal::Decimal;
 use std::error::Error;
 use std::str::FromStr;
 
+/// Converts a raw CSV token transfer and the account address into a normalized [`Transfer`].
 impl From<(&str, Token)> for Transfer {
     fn from((address, event): (&str, Token)) -> Self {
         let value = match Decimal::from_str(&event.token_value.replace(",", "")) {
@@ -29,12 +32,15 @@ impl From<(&str, Token)> for Transfer {
     }
 }
 
+/// Reads a token transfer CSV and converts each row into a [`Transfer`] for the
+/// provided address.
 pub fn read_tokens(file_path: &str, address: &'static str) -> Result<Vec<Transfer>, Box<dyn Error>> {
     Ok(read_csv::<Token>(file_path)?.into_iter().map(|x| (address, x).into()).collect())
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "PascalCase")] // Automatically handles camel case, e.g., "Transaction Hash" -> "TransactionHash"
+/// Raw representation of a token transfer row as exported by Etherscan.
 pub struct Token {
     #[serde(rename = "Transaction Hash")]
     pub transaction_hash: String,

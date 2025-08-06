@@ -33,7 +33,7 @@ impl From<&Vec<Transfer>> for TransactionCategory {
 
       let category: Option<&CategoryMapping> = transfers
         .iter()
-        .map(|x| vec![&x.transfer_id, &x.to, &x.from])
+        .map(|x| vec![&x.transfer_id, &x.to, &x.from, &x.counterparty])
         .flatten()
         .find_map(|key| config.get(key));
 

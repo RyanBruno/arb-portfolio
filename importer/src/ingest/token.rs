@@ -24,6 +24,12 @@ impl From<(&str, Token)> for Transfer {
 
         let token: TokenMeta = (&event.contract_address).into();
 
+        let counterparty = if event.from.to_lowercase() == address.to_lowercase() {
+            event.to.clone()
+        } else {
+            event.from.clone()
+        };
+
         Transfer {
             transfer_id: event.transaction_hash,
             datetime: event.datetime_utc.to_string(),
@@ -33,6 +39,7 @@ impl From<(&str, Token)> for Transfer {
             symbol: event.token_symbol,*/
             value,
             usd_value,
+            counterparty,
             from: event.from,
             to: event.to,
         }

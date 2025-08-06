@@ -9,7 +9,15 @@ use std::str::FromStr;
 /// Converts a CSV transaction row into a [`Transfer`] capturing its ETH movement.
 impl From<(&str, Transaction)> for Transfer {
     fn from((_address, tx): (&str, Transaction)) -> Self {
-        let value = Decimal::from_str(&tx.value_in_eth).ok();
+        let value = match (Decimal::from_str(&tx.value_in_eth), Decimal::from_str(&tx.value_out_eth)) {
+          (Ok(in_eth), Ok(out_eth)) => Some(in_eth - out_eth),
+          _ => None
+        };
+        let usd_value = match (Decimal::from_str(&tx.historical_price_eth), value) {
+          (Ok(price), Some(value)) => Some(price * value),
+          _ => None
+        };
+
         Transfer {
             transfer_id: tx.txhash,
             datetime: tx.datetime_utc.to_string(),
@@ -20,6 +28,7 @@ impl From<(&str, Transaction)> for Transfer {
               stable_usd_value: None,
             },
             value,
+            usd_value,
             from: tx.from,
             to: tx.to,
         }

@@ -1,21 +1,26 @@
 //! Functions for ingesting normal transaction CSVs exported from Etherscan.
 
-use serde::Deserialize;
-use crate::{read_csv, Token, Transfer};
+use crate::{read_csv, Token, Transfer, TransferDirection};
 use rust_decimal::Decimal;
+use serde::Deserialize;
 use std::error::Error;
 use std::str::FromStr;
 
 /// Converts a CSV transaction row into a [`Transfer`] capturing its ETH movement.
 impl From<(&str, Transaction)> for Transfer {
     fn from((address, tx): (&str, Transaction)) -> Self {
-        let value = match (Decimal::from_str(&tx.value_in_eth), Decimal::from_str(&tx.value_out_eth)) {
-          (Ok(in_eth), Ok(out_eth)) => Some(in_eth - out_eth),
-          _ => None
+        let in_eth = Decimal::from_str(&tx.value_in_eth).unwrap_or_default();
+        let out_eth = Decimal::from_str(&tx.value_out_eth).unwrap_or_default();
+        let (value, direction) = if in_eth > Decimal::ZERO {
+            (Some(in_eth), TransferDirection::Incoming)
+        } else if out_eth > Decimal::ZERO {
+            (Some(out_eth), TransferDirection::Outgoing)
+        } else {
+            (None, TransferDirection::Incoming)
         };
         let usd_value = match (Decimal::from_str(&tx.historical_price_eth), value) {
-          (Ok(price), Some(value)) => Some(price * value),
-          _ => None
+            (Ok(price), Some(value)) => Some(price * value),
+            _ => None,
         };
 
         let counterparty = if tx.from.to_lowercase() == address.to_lowercase() {
@@ -28,11 +33,12 @@ impl From<(&str, Transaction)> for Transfer {
             transfer_id: tx.txhash,
             datetime: tx.datetime_utc.to_string(),
             token: Token {
-              asset: "ETH".to_string(),
-              symbol: "ETH".to_string(),
-              address: "ETH".to_string(),
-              stable_usd_value: None,
+                asset: "ETH".to_string(),
+                symbol: "ETH".to_string(),
+                address: "ETH".to_string(),
+                stable_usd_value: None,
             },
+            direction,
             value,
             usd_value,
             counterparty,
@@ -42,8 +48,14 @@ impl From<(&str, Transaction)> for Transfer {
 
 /// Reads a transaction CSV and converts each row into a [`Transfer`] for the
 /// supplied address.
-pub fn read_transactions(file_path: &str, address: &'static str) -> Result<Vec<Transfer>, Box<dyn Error>> {
-    Ok(read_csv::<Transaction>(file_path)?.into_iter().map(|x| (address, x).into()).collect())
+pub fn read_transactions(
+    file_path: &str,
+    address: &'static str,
+) -> Result<Vec<Transfer>, Box<dyn Error>> {
+    Ok(read_csv::<Transaction>(file_path)?
+        .into_iter()
+        .map(|x| (address, x).into())
+        .collect())
 }
 
 #[derive(Debug, Deserialize)]
@@ -59,7 +71,7 @@ pub struct Transaction {
     pub unix_timestamp: u64,
 
     #[serde(rename = "DateTime (UTC)")]
-    pub datetime_utc: String,  // You could use chrono for better handling of time
+    pub datetime_utc: String, // You could use chrono for better handling of time
 
     pub from: String,
 

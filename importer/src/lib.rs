@@ -6,7 +6,9 @@ pub mod category;
 pub mod token;
 
 mod types;
-pub use types::{SwapSubCategory, Token, Transaction, TransactionCategory, Transfer};
+pub use types::{
+    SwapSubCategory, Token, Transaction, TransactionCategory, Transfer, TransferDirection,
+};
 
 pub mod ingest;
 pub use ingest::token::read_tokens;

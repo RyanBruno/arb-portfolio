@@ -24,6 +24,28 @@ pub struct SimpleSwap {
 }
 
 #[derive(Default, Debug, Serialize, PartialEq, Clone)]
+pub enum DebtDirection {
+  Borrow,
+  Repayment,
+  #[default]
+  Unknown,
+}
+
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
+pub struct DebtSwap {
+  /// The direction (Borrow or Repayment) of the debt
+  pub direction: DebtDirection,
+  /// Debt token
+  pub debt_token: Token,
+  /// Value of the debt
+  pub debt_value: Decimal,
+  /// The token borrowed or used to repay
+  pub token: Token,
+  /// Value of the token borrowed or repayment
+  pub value: Decimal,
+}
+
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
 pub struct TwoAssetSwap {
   /// Total USD cost basis for the transaction.
   pub cost_basis: Decimal,
@@ -44,6 +66,8 @@ pub enum SwapSubCategory {
   Simple(SimpleSwap),
   /// Swaps involving multiple assets without a stable USD leg.
   TwoAsset(TwoAssetSwap),
+  /// Swap involving debt repayments or borrowing
+  Debt(DebtSwap),
   /// Unable to determine the swap type.
   #[default]
   UnknownSwap,
@@ -95,6 +119,8 @@ pub struct Token {
   pub address: String,
   #[serde(skip_serializing)]
   pub is_usd: bool,
+  #[serde(skip_serializing)]
+  pub is_debt: bool,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq)]

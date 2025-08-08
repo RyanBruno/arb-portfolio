@@ -56,6 +56,7 @@ impl Serialize for TransactionCategory {
               SwapSubCategory::Simple(_) => "SwapSimple",
               SwapSubCategory::TwoAsset(_) => "SwapTwoAsset",
               SwapSubCategory::UnknownSwap => "SwapUnknown",
+              SwapSubCategory::Debt(_) => "SwapDebt",
             },
             TransactionCategory::Trade => "Trade",
             TransactionCategory::Transfer => "Transfer",

@@ -7,12 +7,12 @@ use std::error::Error;
 use std::str::FromStr;
 
 /// Converts a CSV transaction row into a [`Transfer`] capturing its ETH movement.
-impl From<(&str, Transaction)> for Transfer {
-    fn from((address, tx): (&str, Transaction)) -> Self {
+impl From<(&str, Internal)> for Transfer {
+    fn from((address, tx): (&str, Internal)) -> Self {
         let (value, counterparty, direction) = match tx.from.to_lowercase() == address.to_lowercase() {
           true => (
             Decimal::from_str(&tx.value_out_eth).ok(),
-            tx.to.clone(),
+            tx.tx_to.clone(),
             TransferDirection::Outgoing
           ),
           false => (
@@ -27,7 +27,7 @@ impl From<(&str, Transaction)> for Transfer {
         };
 
         Transfer {
-            transfer_id: tx.txhash,
+            transfer_id: tx.transaction_hash,
             datetime: tx.datetime_utc.to_string(),
             token: Token {
               asset: "ETH".to_string(),
@@ -47,28 +47,39 @@ impl From<(&str, Transaction)> for Transfer {
 
 /// Reads a transaction CSV and converts each row into a [`Transfer`] for the
 /// supplied address.
-pub fn read_transactions(file_path: &str, address: &'static str) -> Result<Vec<Transfer>, Box<dyn Error>> {
-    Ok(read_csv::<Transaction>(file_path)?.into_iter().map(|x| (address, x).into()).collect())
+pub fn read_internals(file_path: &str, address: &'static str) -> Result<Vec<Transfer>, Box<dyn Error>> {
+    Ok(read_csv::<Internal>(file_path)?.into_iter().map(|x| (address, x).into()).collect())
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "PascalCase")]
 /// Raw representation of an Etherscan transaction export.
-pub struct Transaction {
-    #[serde(rename = "Txhash")]
-    pub txhash: String,
+pub struct Internal {
+    #[serde(rename = "Transaction Hash")]
+    pub transaction_hash: String,
 
+    #[serde(rename = "Blockno")]
     pub blockno: u64,
 
     #[serde(rename = "UnixTimestamp")]
     pub unix_timestamp: u64,
 
     #[serde(rename = "DateTime (UTC)")]
-    pub datetime_utc: String,  // You could use chrono for better handling of time
+    pub datetime_utc: String, // Consider chrono's `NaiveDateTime` if you want date parsing
 
+    #[serde(rename = "ParentTxFrom")]
+    pub parent_tx_from: String,
+
+    #[serde(rename = "ParentTxTo")]
+    pub parent_tx_to: String,
+
+    #[serde(rename = "ParentTxETH_Value")]
+    pub parent_tx_eth_value: String,
+
+    #[serde(rename = "From")]
     pub from: String,
 
-    pub to: String,
+    #[serde(rename = "TxTo")]
+    pub tx_to: String,
 
     #[serde(rename = "ContractAddress")]
     pub contract_address: String,
@@ -79,22 +90,21 @@ pub struct Transaction {
     #[serde(rename = "Value_OUT(ETH)")]
     pub value_out_eth: String,
 
-    #[serde(rename = "CurrentValue @ $3525.11740105424/ETH")]
+    #[serde(rename = "CurrentValue @ $4045.59366105672/ETH")]
     pub current_value: String,
-
-    #[serde(rename = "TxnFee(ETH)")]
-    pub txn_fee_eth: String,
-
-    #[serde(rename = "TxnFee(USD)")]
-    pub txn_fee_usd: String,
 
     #[serde(rename = "Historical $Price/ETH")]
     pub historical_price_eth: String,
 
+    #[serde(rename = "Status")]
     pub status: String,
 
     #[serde(rename = "ErrCode")]
     pub err_code: String,
 
-    pub method: String,
+    #[serde(rename = "Type")]
+    pub tx_type: String,
+
+    #[serde(rename = "PrivateNote")]
+    pub private_note: String,
 }

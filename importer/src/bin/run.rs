@@ -4,7 +4,8 @@ use clap::Parser;
 use std::error::Error;
 use arb_portfolio::{
   read_tokens, write_csv, Transaction, Transfer,
-  //read_transactions, 
+  //read_transactions,
+  read_internals,
 };
 use arb_portfolio::transaction::ToTransaction;
 
@@ -24,8 +25,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     // initialize logging from log4rs config file
     log4rs::init_file("log4rs.yml", Default::default()).expect("failed to init logger");
   
-    let transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
+    let mut transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
     //transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
+    transfers.extend(read_internals("data/ingest/internal.csv", ADDRESS)?);
 
    let transactions: Vec<Transaction> = transfers.clone().to_transaction();
 

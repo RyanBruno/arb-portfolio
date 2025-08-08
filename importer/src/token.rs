@@ -20,6 +20,7 @@ pub struct TokenMeta {
   pub asset: String,
   /// Short symbol representation, e.g. `"ETH"`.
   pub symbol: String,
+  pub is_debt: bool,
   /// Optional USD value of a single token at import time.
   pub stable_usd_value: Option<String>,
 }
@@ -33,6 +34,7 @@ impl Default for Token {
         address: String::from("Unknown"),
         stable_usd_value: None,
         is_usd: false,
+        is_debt: false,
       }
     }
 }
@@ -57,6 +59,7 @@ impl From<&String> for Token {
             .as_ref()
             .map(|x| Decimal::from_str(x).unwrap()),
           is_usd: meta.stable_usd_value.is_some(),
+          is_debt: meta.is_debt,
         },
         None => Token {
           address: address.to_string(),

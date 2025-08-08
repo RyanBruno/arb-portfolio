@@ -3,6 +3,7 @@
 use crate::{TransferDirection, Transaction, Transfer};
 use std::collections::HashMap;
 use std::ops::Add;
+use rust_decimal::Decimal;
 
 /// Convert intermediate types into a collection of [`Transaction`]s.
 pub trait ToTransaction {
@@ -127,6 +128,9 @@ impl ToTransaction for Vec<Transfer> {
       transaction_map
           .into_values()
           .map(|mut transaction| {
+              transaction.net_transfers.retain(|t| {
+                  t.value.unwrap_or_default() != Decimal::ZERO
+              });
               transaction.category = (&transaction.net_transfers).into();
               transaction
           })

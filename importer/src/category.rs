@@ -53,7 +53,6 @@ impl Serialize for TransactionCategory {
     {
         let name = match self {
             TransactionCategory::Swap(sub) => match sub {
-              SwapSubCategory::Simple(_) => "SwapSimple",
               SwapSubCategory::TwoAsset(_) => "SwapTwoAsset",
               SwapSubCategory::UnknownSwap => "SwapUnknown",
               SwapSubCategory::Debt(_) => "SwapDebt",

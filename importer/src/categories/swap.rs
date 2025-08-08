@@ -1,38 +1,10 @@
-use crate::{Transfer, SwapSubCategory, SimpleSwap, TwoAssetSwap, TransferDirection,
+use crate::{Transfer, SwapSubCategory, TwoAssetSwap, TransferDirection,
   DebtSwap, DebtDirection,
 };
 use itertools::Itertools;
 
 use rust_decimal::Decimal;
 use std::str::FromStr;
-
-/// Determines whether a set of transfers represents a simple two-token swap.
-fn is_simple_swap(transfers: &[Transfer]) -> bool {
-  transfers.len() == 2 && transfers.iter().filter(|x| x.token.stable_usd_value.is_some()).count() == 1
-}
-
-impl TryFrom<&Vec<Transfer>> for SimpleSwap {
-    type Error = &'static str;
-    fn try_from(transfers: &Vec<Transfer>) -> Result<SimpleSwap, &'static str> {
-      if !is_simple_swap(&transfers) { return Err("Nope"); }
-
-      let usd_transfer = transfers.iter().find(|x| x.token.is_usd);
-      let asset_transfer = transfers.iter().find(|x| x.token.is_usd);
-
-      match (usd_transfer, asset_transfer) {
-        (Some(usd_transfer), Some(asset_transfer)) => match (usd_transfer.value, asset_transfer.value) {
-          (Some(cost_basis), Some(value)) => Ok(SimpleSwap {
-            cost_basis,
-            direction: asset_transfer.direction.clone().into(),
-            token: asset_transfer.token.clone(),
-            value,
-          }),
-          _ => Err("Nope"),
-        },
-        _ => Err("Nope"),
-      }
-    }
-}
 
 impl TryFrom<&Vec<Transfer>> for DebtSwap {
     type Error = &'static str;
@@ -104,10 +76,6 @@ impl TryFrom<&Vec<Transfer>> for TwoAssetSwap {
 
 impl From<&Vec<Transfer>> for SwapSubCategory {
   fn from(transfers: &Vec<Transfer>) -> Self {
-    /*let simple: Result<SimpleSwap, _> = transfers.try_into();
-    if let Ok(simple) = simple {
-      return SwapSubCategory::Simple(simple);
-    }*/
     let two_asset: Result<TwoAssetSwap, _> = transfers.try_into();
     if let Ok(two_asset) = two_asset {
       return SwapSubCategory::TwoAsset(two_asset);

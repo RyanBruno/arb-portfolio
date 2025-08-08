@@ -108,6 +108,7 @@ impl Add<Transfer> for Transaction {
         transfer_id: transfer.transfer_id.clone(),
         datetime: transfer.datetime.clone(),
         category: Default::default(),
+        assets: self.assets + "|" + &transfer.token.symbol,
         net_transfers: transfer + slice,
       }
     }
@@ -131,6 +132,7 @@ impl ToTransaction for Vec<Transfer> {
               transaction.net_transfers.retain(|t| {
                   t.value.unwrap_or_default() != Decimal::ZERO
               });
+              transaction.assets = transaction.net_transfers.iter().map(|x| x.token.symbol.clone()).collect::<Vec<String>>().join("|");
               transaction.category = (&transaction.net_transfers).into();
               transaction
           })

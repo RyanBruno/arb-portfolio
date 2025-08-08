@@ -3,24 +3,27 @@
 use serde::Serialize;
 use rust_decimal::Decimal;
 
+pub struct CostBasisTransfer {
+  /// Identifier shared across the underlying transfers.
+  pub transfer_id: String,
+  /// ISO8601 timestamp of the transfer.
+  pub datetime: String,
+  /// Token being transferred.
+  pub token: Token,
+  /// Signed Amount of token moved
+  pub value: Decimal,
+
+  pub sale_price: Decimal,
+  pub cost_basis: Decimal,
+  pub PnL: Decimal,
+}
+
 #[derive(Default, Debug, Serialize, PartialEq, Clone)]
 pub enum SwapDirection {
   Purchase,
   Sale,
   #[default]
   Unknown,
-}
-
-#[derive(Default, Debug, Serialize, PartialEq, Clone)]
-pub struct SimpleSwap {
-  /// Total USD cost basis for the transaction.
-  pub cost_basis: Decimal,
-  /// The direction (Purchase or Sale) of the swap
-  pub direction: SwapDirection,
-  /// Token Swapped
-  pub token: Token,
-  /// Net value moved by the transaction.
-  pub value: Decimal,
 }
 
 #[derive(Default, Debug, Serialize, PartialEq, Clone)]
@@ -62,8 +65,6 @@ pub struct TwoAssetSwap {
 #[derive(Default, Debug, Serialize, PartialEq, Clone)]
 /// Granular classification for swap transactions.
 pub enum SwapSubCategory {
-  /// A simple two-leg swap where one side has a stable USD value.
-  Simple(SimpleSwap),
   /// Swaps involving multiple assets without a stable USD leg.
   TwoAsset(TwoAssetSwap),
   /// Swap involving debt repayments or borrowing
@@ -103,6 +104,7 @@ pub struct Transaction {
   /// Source transfers that compose this transaction.
   #[serde(skip_serializing)]
   pub net_transfers: Vec<Transfer>,
+  pub assets: String,
 }
 
 #[derive(Debug, Serialize, Clone, PartialEq)]

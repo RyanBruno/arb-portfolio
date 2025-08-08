@@ -10,7 +10,7 @@ pub mod direction;
 mod types;
 pub use types::{
   SwapSubCategory, Token, Transaction, TransactionCategory,
-  Transfer, TransferDirection, SimpleSwap, TwoAssetSwap, SwapDirection,
+  Transfer, TransferDirection, TwoAssetSwap, SwapDirection,
   DebtSwap, DebtDirection,
 };
 

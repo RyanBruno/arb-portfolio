@@ -32,6 +32,7 @@ impl Default for Token {
         symbol: String::from("Unknown"),
         address: String::from("Unknown"),
         stable_usd_value: None,
+        is_usd: false,
       }
     }
 }
@@ -55,6 +56,7 @@ impl From<&String> for Token {
             .stable_usd_value
             .as_ref()
             .map(|x| Decimal::from_str(x).unwrap()),
+          is_usd: meta.stable_usd_value.is_some(),
         },
         None => Token {
           address: address.to_string(),

@@ -3,10 +3,15 @@
 mod read_csv;
 pub use read_csv::{read_csv, write_csv};
 pub mod category;
+pub mod categories;
 pub mod token;
+pub mod direction;
 
 mod types;
-pub use types::{SwapSubCategory, Token, Transaction, TransactionCategory, Transfer};
+pub use types::{
+  SwapSubCategory, Token, Transaction, TransactionCategory,
+  Transfer, TransferDirection, SimpleSwap, TwoAssetSwap, SwapDirection
+};
 
 pub mod ingest;
 pub use ingest::token::read_tokens;

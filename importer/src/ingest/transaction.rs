@@ -1,7 +1,7 @@
 //! Functions for ingesting normal transaction CSVs exported from Etherscan.
 
 use serde::Deserialize;
-use crate::{read_csv, Token, Transfer};
+use crate::{read_csv, Token, Transfer, TransferDirection};
 use rust_decimal::Decimal;
 use std::error::Error;
 use std::str::FromStr;
@@ -9,19 +9,21 @@ use std::str::FromStr;
 /// Converts a CSV transaction row into a [`Transfer`] capturing its ETH movement.
 impl From<(&str, Transaction)> for Transfer {
     fn from((address, tx): (&str, Transaction)) -> Self {
-        let value = match (Decimal::from_str(&tx.value_in_eth), Decimal::from_str(&tx.value_out_eth)) {
-          (Ok(in_eth), Ok(out_eth)) => Some(in_eth - out_eth),
-          _ => None
+        let (value, counterparty, direction) = match tx.from.to_lowercase() == address.to_lowercase() {
+          true => (
+            Decimal::from_str(&tx.value_out_eth).ok(),
+            tx.to.clone(),
+            TransferDirection::Outgoing
+          ),
+          false => (
+            Decimal::from_str(&tx.value_in_eth).ok(),
+            tx.from.clone(),
+            TransferDirection::Incoming
+          ),
         };
         let usd_value = match (Decimal::from_str(&tx.historical_price_eth), value) {
           (Ok(price), Some(value)) => Some(price * value),
           _ => None
-        };
-
-        let counterparty = if tx.from.to_lowercase() == address.to_lowercase() {
-            tx.to.clone()
-        } else {
-            tx.from.clone()
         };
 
         Transfer {
@@ -32,9 +34,11 @@ impl From<(&str, Transaction)> for Transfer {
               symbol: "ETH".to_string(),
               address: "ETH".to_string(),
               stable_usd_value: None,
+              is_usd: false,
             },
             value,
             usd_value,
+            direction,
             counterparty,
         }
     }

@@ -1,6 +1,6 @@
 //! Functions for ingesting token transfer CSVs exported from Etherscan.
 
-use crate::{read_csv, Token as TokenMeta, Transfer};
+use crate::{read_csv, Token as TokenMeta, Transfer, TransferDirection};
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::error::Error;
@@ -9,33 +9,20 @@ use std::str::FromStr;
 /// Converts a raw CSV token transfer and the account address into a normalized [`Transfer`].
 impl From<(&str, Token)> for Transfer {
     fn from((address, event): (&str, Token)) -> Self {
-        let token_value_raw = Decimal::from_str(&event.token_value.replace(",", ""));
-        let usd_value_raw = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", ""));
-
-        let neg_one = Decimal::from_str("-1").unwrap();
-
-        let (value, mut usd_value) = match (token_value_raw, usd_value_raw) {
-            (Ok(value), Ok(usd_value)) if event.from.to_lowercase() != address.to_lowercase() => {
-                (Some(value), Some(usd_value))
-            }
-            (Ok(value), Ok(usd_value)) if event.from.to_lowercase() == address.to_lowercase() => {
-                (Some(value * neg_one), Some(usd_value * neg_one))
-            }
-            (Ok(value), _) if event.from.to_lowercase() != address.to_lowercase() => {
-                (Some(value), None)
-            }
-            (Ok(value), _) if event.from.to_lowercase() == address.to_lowercase() => {
-                (Some(value * neg_one), None)
-            }
-            (Err(_), _) => (None, None),
-            _ => panic!(),
-        };
 
         let token: TokenMeta = (&event.contract_address).into();
+
+        let value = Decimal::from_str(&event.token_value.replace(",", "")).ok();
+        let mut usd_value = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", "")).ok();
 
         if let (Some(stable), Some(amount)) = (token.stable_usd_value, value) {
             usd_value = Some(amount * stable);
         }
+
+        let direction = match event.from.to_lowercase() == address.to_lowercase() {
+          true => TransferDirection::Outgoing,
+          false => TransferDirection::Incoming,
+        };
 
         let counterparty = if event.from.to_lowercase() == address.to_lowercase() {
             event.to.clone()
@@ -52,6 +39,7 @@ impl From<(&str, Token)> for Transfer {
             symbol: event.token_symbol,*/
             value,
             usd_value,
+            direction,
             counterparty,
         }
     }

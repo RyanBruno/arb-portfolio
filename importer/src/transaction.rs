@@ -2,7 +2,6 @@
 
 use crate::{Transaction, TransactionCategory, Transfer};
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::str::FromStr;
 
 use rust_decimal::Decimal;
@@ -49,20 +48,20 @@ impl ToTransaction for Vec<Transfer> {
             let datetime = net_transfers.first().unwrap().datetime.clone();
             let category: TransactionCategory = (&net_transfers).into();
 
-            let mut seen = HashSet::new();
+            /*let mut seen = HashSet::new();
             let assets = net_transfers.iter()
               .filter(|x| x.token.stable_usd_value.is_none())
               .map(|x| x.token.asset.clone())
               .filter(|x| seen.insert(x.clone()))
               .collect::<Vec<String>>()      // Collect into a Vec<&String>
-              .join("|");
+              .join("|");*/
 
-            let value = net_transfers.iter()
+            /*let value = net_transfers.iter()
               .filter(|x| x.token.stable_usd_value.is_none())
               .map(|x| x.value.unwrap_or_default())
-              .sum();
+              .sum();*/
 
-            let (cost_basis, c) = net_transfers.iter()
+            /*let (cost_basis, c) = net_transfers.iter()
               .filter_map(|x| x.usd_value)
               .fold((Decimal::ZERO, 0u32), |(s, c), x| (s + x, c + 1));
 
@@ -70,15 +69,15 @@ impl ToTransaction for Vec<Transfer> {
               Some(cost_basis / Decimal::from(c))
             } else {
               None
-            };
+            };*/
 
             Transaction {
               transfer_id,
               datetime,
               category,
-              cost_basis: cost_basis.unwrap_or_default(),
-              assets,
-              value,
+              //cost_basis: cost_basis.unwrap_or_default(),
+              //assets,
+              //value,
               net_transfers,
             }
           })

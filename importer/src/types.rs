@@ -4,12 +4,46 @@ use serde::Serialize;
 use rust_decimal::Decimal;
 
 #[derive(Default, Debug, Serialize, PartialEq)]
+pub enum SwapDirection {
+  Purchase,
+  Sale,
+  #[default]
+  Unknown,
+}
+
+#[derive(Default, Debug, Serialize, PartialEq)]
+pub struct SimpleSwap {
+  /// Total USD cost basis for the transaction.
+  pub cost_basis: Decimal,
+  /// The direction (Purchase or Sale) of the swap
+  pub direction: SwapDirection,
+  /// Token Swapped
+  pub token: Token,
+  /// Net value moved by the transaction.
+  pub value: Decimal,
+}
+
+#[derive(Default, Debug, Serialize, PartialEq)]
+pub struct TwoAssetSwap {
+  /// Total USD cost basis for the transaction.
+  pub cost_basis: Decimal,
+  /// Token purchased
+  pub token_purchased: Token,
+  /// Token sold
+  pub token_sold: Token,
+  /// Value of the token purchased
+  pub value_purchased: Decimal,
+  /// Value of the token sold
+  pub value_sold: Decimal,
+}
+
+#[derive(Default, Debug, Serialize, PartialEq)]
 /// Granular classification for swap transactions.
 pub enum SwapSubCategory {
   /// A simple two-leg swap where one side has a stable USD value.
-  Simple,
+  Simple(SimpleSwap),
   /// Swaps involving multiple assets without a stable USD leg.
-  MultiAsset,
+  TwoAsset(TwoAssetSwap),
   /// Unable to determine the swap type.
   #[default]
   UnknownSwap,
@@ -42,12 +76,6 @@ pub struct Transaction {
   pub datetime: String,
   /// Classification of the transaction.
   pub category: TransactionCategory,
-  /// Total USD cost basis for the transaction.
-  pub cost_basis: Decimal,
-  /// Pipe-separated list of unique assets involved.
-  pub assets: String,
-  /// Net value moved by the transaction.
-  pub value: Decimal,
   /// Source transfers that compose this transaction.
   #[serde(skip_serializing)]
   pub net_transfers: Vec<Transfer>,
@@ -65,6 +93,17 @@ pub struct Token {
   /// Contract address for the token.
   #[serde(skip_serializing)]
   pub address: String,
+  #[serde(skip_serializing)]
+  pub is_usd: bool,
+}
+
+#[derive(Debug, Serialize, Clone, PartialEq)]
+/// Direction of value movement relative to the observed account.
+pub enum TransferDirection {
+    /// Tokens moving into the account.
+    Incoming,
+    /// Tokens moving out of the account.
+    Outgoing,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -76,10 +115,12 @@ pub struct Transfer {
   pub datetime: String,
   /// Token being transferred.
   pub token: Token,
-  /// Amount of token moved, positive for incoming and negative for outgoing.
+  /// Amount of token moved.
   pub value: Option<Decimal>,
   /// USD value of the transfer at the time of the transaction.
   pub usd_value: Option<Decimal>,
+  /// Direction of the transfer.
+  pub direction: TransferDirection,
   /// Address on the other side of the transfer relative to the observed account.
   #[serde(skip_serializing)]
   pub counterparty: String,

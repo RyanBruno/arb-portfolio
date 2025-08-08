@@ -1,6 +1,6 @@
 //! Utilities for classifying transfers into [`TransactionCategory`] values.
 
-use crate::{SwapSubCategory, TransactionCategory, Transfer};
+use crate::{TransactionCategory, Transfer};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -17,11 +17,6 @@ struct CategoryMapping {
 /// Convenience alias for the category configuration file.
 type CategoryConfig = HashMap<String, CategoryMapping>;
 
-/// Determines whether a set of transfers represents a simple two-token swap.
-fn is_simple_swap(transfers: &[Transfer]) -> bool {
-  transfers.len() == 2 && transfers.iter().filter(|x| x.token.stable_usd_value.is_some()).count() == 1
-}
-
 /// Derives a [`TransactionCategory`] for a group of transfers by consulting
 /// `data/ref/categories.toml` and falling back to heuristics when needed.
 impl From<&Vec<Transfer>> for TransactionCategory {
@@ -37,8 +32,9 @@ impl From<&Vec<Transfer>> for TransactionCategory {
         .find_map(|key| config.get(key));
 
       match category.map(|x| x.category.as_str()) {
-          Some("Swap") if is_simple_swap(transfers) => TransactionCategory::Swap(SwapSubCategory::Simple),
-          Some("Swap") => TransactionCategory::Swap(Default::default()),
+          //Some("Swap") if is_simple_swap(transfers) => TransactionCategory::Swap(SwapSubCategory::Simple),
+          //Some("Swap") => TransactionCategory::Swap(Default::default()),
+          Some("Swap") => transfers.into(),
           Some("Trade") => TransactionCategory::Trade,
           Some("Transfer") => TransactionCategory::Transfer,
           Some("Airdrop") => TransactionCategory::Airdrop,

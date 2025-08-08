@@ -27,15 +27,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     let transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
     //transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
 
-    let transactions: Vec<Transaction> = transfers.clone().to_transaction();
+   let transactions: Vec<Transaction> = transfers.clone().to_transaction();
 
-    /*let swaps: Vec<Transfer> = transactions.into_iter().filter(|x| x.category == TransactionCategory::Swap)
-      .map(|x| x.transfer)
-      .flatten()
-      .collect();*/
+   let net_transfers: Vec<Transfer> = transactions.iter().flat_map(|x| x.net_transfers.clone()).collect();
 
     write_csv(&transactions, "transactions.csv")?;
-    write_csv(&transfers, "transfers.csv")?;
+    write_csv(&net_transfers, "transfers.csv")?;
 
     Ok(())
 }

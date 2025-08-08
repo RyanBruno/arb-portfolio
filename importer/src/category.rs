@@ -1,9 +1,10 @@
 //! Utilities for classifying transfers into [`TransactionCategory`] values.
 
-use crate::{TransactionCategory, Transfer};
+use crate::{TransactionCategory, Transfer, SwapSubCategory};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use serde::{Serialize, Serializer};
 
 use serde::Deserialize;
 
@@ -28,13 +29,13 @@ impl From<&Vec<Transfer>> for TransactionCategory {
 
       let category: Option<&CategoryMapping> = transfers
         .iter()
-        .flat_map(|x| vec![&x.transfer_id, &x.counterparty])
+        .flat_map(|x| vec![vec![&x.transfer_id], x.counterparty.iter().collect()].concat())
         .find_map(|key| config.get(key));
 
       match category.map(|x| x.category.as_str()) {
           //Some("Swap") if is_simple_swap(transfers) => TransactionCategory::Swap(SwapSubCategory::Simple),
           //Some("Swap") => TransactionCategory::Swap(Default::default()),
-          Some("Swap") => transfers.into(),
+          Some("Swap") => TransactionCategory::Swap(transfers.into()),
           Some("Trade") => TransactionCategory::Trade,
           Some("Transfer") => TransactionCategory::Transfer,
           Some("Airdrop") => TransactionCategory::Airdrop,
@@ -45,28 +46,23 @@ impl From<&Vec<Transfer>> for TransactionCategory {
     }
 }
 
-/*impl From<Vec<&String>> for TransactionCategory {
-    fn from(addrs: Vec<&String>) -> Self {
-      // Load categories from the TOML file
-      let path = Path::new("data/ref/categories.toml");
-      let toml_str = fs::read_to_string(path).unwrap();
-      let config: CategoryConfig = toml::de::from_str(&toml_str).unwrap();
-
-      // Iterate over the addresses and check for matches
-      for addr in addrs.clone() {
-          for (address, mapping) in &config {
-              if address.to_lowercase() == addr.to_lowercase() {
-                  match mapping.category.as_str() {
-                      "Swap" => return TransactionCategory::Swap,
-                      "Trade" => return TransactionCategory::Trade,
-                      "Transfer" => return TransactionCategory::Transfer,
-                      "Airdrop" => return TransactionCategory::Airdrop,
-                      "Ignore" => return TransactionCategory::Ignore,
-                      _ => panic!(),
-                  }
-              }
-          }
-      }
-      Default::default()
+impl Serialize for TransactionCategory {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let name = match self {
+            TransactionCategory::Swap(sub) => match sub {
+              SwapSubCategory::Simple(_) => "SwapSimple",
+              SwapSubCategory::TwoAsset(_) => "SwapTwoAsset",
+              SwapSubCategory::UnknownSwap => "SwapUnknown",
+            },
+            TransactionCategory::Trade => "Trade",
+            TransactionCategory::Transfer => "Transfer",
+            TransactionCategory::Airdrop => "Airdrop",
+            TransactionCategory::Ignore => "Ignore",
+            TransactionCategory::Unknown => "Unknown",
+        };
+        serializer.serialize_str(name)
     }
-}*/
+}

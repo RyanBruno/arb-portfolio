@@ -3,7 +3,7 @@
 use serde::Serialize;
 use rust_decimal::Decimal;
 
-#[derive(Default, Debug, Serialize, PartialEq)]
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
 pub enum SwapDirection {
   Purchase,
   Sale,
@@ -11,7 +11,7 @@ pub enum SwapDirection {
   Unknown,
 }
 
-#[derive(Default, Debug, Serialize, PartialEq)]
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
 pub struct SimpleSwap {
   /// Total USD cost basis for the transaction.
   pub cost_basis: Decimal,
@@ -23,7 +23,7 @@ pub struct SimpleSwap {
   pub value: Decimal,
 }
 
-#[derive(Default, Debug, Serialize, PartialEq)]
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
 pub struct TwoAssetSwap {
   /// Total USD cost basis for the transaction.
   pub cost_basis: Decimal,
@@ -37,7 +37,7 @@ pub struct TwoAssetSwap {
   pub value_sold: Decimal,
 }
 
-#[derive(Default, Debug, Serialize, PartialEq)]
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
 /// Granular classification for swap transactions.
 pub enum SwapSubCategory {
   /// A simple two-leg swap where one side has a stable USD value.
@@ -49,7 +49,7 @@ pub enum SwapSubCategory {
   UnknownSwap,
 }
 
-#[derive(Default, Debug, Serialize, PartialEq)]
+#[derive(Default, Debug, PartialEq, Clone)]
 /// High level category describing the nature of a [`Transaction`].
 pub enum TransactionCategory {
   /// Automated market-maker swap (e.g. AAVE).
@@ -67,7 +67,7 @@ pub enum TransactionCategory {
   Unknown,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Default, Clone)]
 /// Grouped representation of on-chain activity consisting of one or more [`Transfer`]s.
 pub struct Transaction {
   /// Identifier shared across the underlying transfers.
@@ -123,6 +123,6 @@ pub struct Transfer {
   pub direction: TransferDirection,
   /// Address on the other side of the transfer relative to the observed account.
   #[serde(skip_serializing)]
-  pub counterparty: String,
+  pub counterparty: Vec<String>,
 }
 

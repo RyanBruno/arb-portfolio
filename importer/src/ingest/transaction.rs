@@ -39,7 +39,7 @@ impl From<(&str, Transaction)> for Transfer {
             value,
             usd_value,
             direction,
-            counterparty,
+            counterparty: vec![counterparty],
         }
     }
 }

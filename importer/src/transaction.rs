@@ -1,10 +1,8 @@
 //! Conversion logic for grouping raw [`Transfer`]s into higher level [`Transaction`] records.
 
-use crate::{Transaction, TransactionCategory, Transfer};
+use crate::{TransferDirection, Transaction, Transfer};
 use std::collections::HashMap;
-use std::str::FromStr;
-
-use rust_decimal::Decimal;
+use std::ops::Add;
 
 /// Convert intermediate types into a collection of [`Transaction`]s.
 pub trait ToTransaction {
@@ -12,74 +10,125 @@ pub trait ToTransaction {
     fn to_transaction(self) -> Vec<Transaction>;
 }
 
+impl Add for Transfer {
+    type Output = Option<Transfer>;
+
+    fn add(self, other: Transfer) -> Option<Transfer> {
+      match (&self.direction, &other.direction) {
+        (TransferDirection::Incoming, TransferDirection::Incoming) => Some(Transfer {
+          transfer_id: self.transfer_id,
+          datetime: self.datetime,
+          token: self.token,
+          counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
+          value: self.value.and_then(|x| other.value.map(|y| x+y)),
+          usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x+y)),
+          direction: TransferDirection::Incoming,
+        }),
+        (TransferDirection::Outgoing, TransferDirection::Outgoing) => Some(Transfer {
+          transfer_id: self.transfer_id,
+          datetime: self.datetime,
+          token: self.token,
+          counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
+          value: self.value.and_then(|x| other.value.map(|y| x+y)),
+          usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x+y)),
+          direction: TransferDirection::Outgoing,
+        }),
+        (TransferDirection::Incoming, TransferDirection::Outgoing) if self.value > other.value => Some(Transfer {
+          transfer_id: self.transfer_id,
+          datetime: self.datetime,
+          token: self.token,
+          counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
+          value: self.value.and_then(|x| other.value.map(|y| x-y)),
+          usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x-y)),
+          direction: TransferDirection::Incoming,
+        }),
+        (TransferDirection::Outgoing, TransferDirection::Incoming) if self.value > other.value => Some(Transfer {
+          transfer_id: self.transfer_id,
+          datetime: self.datetime,
+          token: self.token,
+          counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
+          value: self.value.and_then(|x| other.value.map(|y| x-y)),
+          usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x-y)),
+          direction: TransferDirection::Outgoing,
+        }),
+        (TransferDirection::Incoming, TransferDirection::Outgoing) if self.value < other.value => Some(Transfer {
+          transfer_id: self.transfer_id,
+          datetime: self.datetime,
+          token: self.token,
+          counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
+          value: self.value.and_then(|x| other.value.map(|y| y-x)),
+          usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| y-x)),
+          direction: TransferDirection::Outgoing,
+        }),
+        (TransferDirection::Outgoing, TransferDirection::Incoming) if self.value < other.value => Some(Transfer {
+          transfer_id: self.transfer_id,
+          datetime: self.datetime,
+          token: self.token,
+          counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
+          value: self.value.and_then(|x| other.value.map(|y| y-x)),
+          usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| y-x)),
+          direction: TransferDirection::Incoming,
+        }),
+        _ => None,
+      }
+    }
+}
+
+
+impl Add<&[Transfer]> for Transfer {
+    type Output = Vec<Transfer>;
+
+    fn add(self, net_transfers: &[Transfer]) -> Vec<Transfer> {
+      match net_transfers.iter().position(|x| *x == self) {
+        Some(idx) => {
+          let mut net_transfers: Vec<Transfer> = net_transfers.into();
+          let current = net_transfers.remove(idx);
+
+          if let Some(transfer) = self + current {
+            net_transfers.push(transfer);
+          }
+          net_transfers
+        },
+        None => {
+          let mut net_transfers: Vec<Transfer> = net_transfers.into();
+          net_transfers.push(self);
+          net_transfers
+        }
+      }
+    }
+}
+
+impl Add<Transfer> for Transaction {
+    type Output = Self;
+
+    fn add(self, transfer: Transfer) -> Self {
+      let slice: &[Transfer] = &self.net_transfers;
+      Self {
+        transfer_id: transfer.transfer_id.clone(),
+        datetime: transfer.datetime.clone(),
+        category: Default::default(),
+        net_transfers: transfer + slice,
+      }
+    }
+}
+
 /// Groups a list of [`Transfer`]s by their identifier to build [`Transaction`]s.
 impl ToTransaction for Vec<Transfer> {
     fn to_transaction(self) -> Vec<Transaction> {
-      let mut transaction_map: HashMap<String, Vec<Transfer>> = HashMap::new();
+      let mut transaction_map: HashMap<String, Transaction> = HashMap::new();
 
       for transfer in self {
-          transaction_map
-              .entry(transfer.transfer_id.clone())
-              .or_default()
-              .push(transfer);
+          let current = transaction_map
+            .entry(transfer.transfer_id.clone())
+            .or_default();
+          *current = current.clone() + transfer;
       }
 
-      // Create a Vec of transaction from the grouped transfers
       transaction_map
-          .into_iter()
-          .map(|(transfer_id, transfers)| {
-
-            // Combine transfers that are equal ignoring value to compute net transfers
-            let mut net_transfers: Vec<Transfer> = Vec::new();
-            for t in transfers.into_iter() {
-              if let Some(existing) = net_transfers.iter_mut().find(|e| *e == &t) {
-                let sum = existing.value.unwrap_or_default() + t.value.unwrap_or_default();
-                existing.value = Some(sum);
-              } else {
-                net_transfers.push(t);
-              }
-            }
-            // Remove any transfers that net to zero before classification
-            let net_transfers: Vec<Transfer> = net_transfers
-              .into_iter()
-              .filter(|x| x.value.unwrap_or_default() != Decimal::from_str("0").unwrap())
-              .collect();
-
-            let datetime = net_transfers.first().unwrap().datetime.clone();
-            let category: TransactionCategory = (&net_transfers).into();
-
-            /*let mut seen = HashSet::new();
-            let assets = net_transfers.iter()
-              .filter(|x| x.token.stable_usd_value.is_none())
-              .map(|x| x.token.asset.clone())
-              .filter(|x| seen.insert(x.clone()))
-              .collect::<Vec<String>>()      // Collect into a Vec<&String>
-              .join("|");*/
-
-            /*let value = net_transfers.iter()
-              .filter(|x| x.token.stable_usd_value.is_none())
-              .map(|x| x.value.unwrap_or_default())
-              .sum();*/
-
-            /*let (cost_basis, c) = net_transfers.iter()
-              .filter_map(|x| x.usd_value)
-              .fold((Decimal::ZERO, 0u32), |(s, c), x| (s + x, c + 1));
-
-            let cost_basis = if c > 0 {
-              Some(cost_basis / Decimal::from(c))
-            } else {
-              None
-            };*/
-
-            Transaction {
-              transfer_id,
-              datetime,
-              category,
-              //cost_basis: cost_basis.unwrap_or_default(),
-              //assets,
-              //value,
-              net_transfers,
-            }
+          .into_values()
+          .map(|mut transaction| {
+              transaction.category = (&transaction.net_transfers).into();
+              transaction
           })
           .collect()
     }

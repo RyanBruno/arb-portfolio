@@ -30,6 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut transfers = Transfer::net_transfers(transfers);
     let transfers = Transfer::populate_usd(&mut transfers);
+    let transfers = Transfer::apply_manual_usd(transfers);
 
     write_csv(&transfers, "transfers.csv")?;
 

@@ -1,8 +1,12 @@
 use std::cmp::PartialEq;
 use crate::{Transfer};
 use std::collections::HashMap;
+use std::fs;
+use std::path::Path;
+use std::str::FromStr;
 use rust_decimal::Decimal;
 use std::ops::Neg;
+use serde::Deserialize;
 
 impl PartialEq for Transfer {
   #[allow(clippy::nonminimal_bool)]
@@ -17,6 +21,15 @@ impl PartialEq for Transfer {
 pub trait NetTransfers {
   fn net_transfers(_: Vec<Transfer>) -> Vec<Transfer>;
   fn populate_usd(_: &mut Vec<Transfer>) -> &mut Vec<Transfer>;
+  /// Applies manual USD overrides from `data/ref/manual_usd.toml`.
+  fn apply_manual_usd(_: &mut Vec<Transfer>) -> &mut Vec<Transfer>;
+}
+
+#[derive(Debug, Deserialize)]
+/// USD value override loaded from configuration.
+struct ManualUsd {
+  /// Absolute USD value associated with a `transfer_id`.
+  usd_value: String,
 }
 
 impl NetTransfers for Transfer {
@@ -62,6 +75,23 @@ impl NetTransfers for Transfer {
       }
 
     });
+    transfers
+  }
+
+  fn apply_manual_usd(transfers: &mut Vec<Transfer>) -> &mut Vec<Transfer> {
+    // Load manual USD overrides keyed by transfer_id.
+    let path = Path::new("data/ref/manual_usd.toml");
+    let toml_str = fs::read_to_string(path).unwrap_or_else(|_| String::new());
+    let overrides: HashMap<String, ManualUsd> = toml::de::from_str(&toml_str).unwrap_or_default();
+
+    transfers.iter_mut().for_each(|transfer| {
+      if let Some(item) = overrides.get(&transfer.transfer_id) {
+        let usd = Decimal::from_str(&item.usd_value).unwrap();
+        // Preserve sign of original value when applying override.
+        transfer.usd_value = Some(if transfer.value.is_sign_positive() { usd } else { usd.neg() });
+      }
+    });
+
     transfers
   }
 

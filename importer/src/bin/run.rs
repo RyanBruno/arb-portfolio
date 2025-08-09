@@ -6,6 +6,7 @@ use arb_portfolio::{
   read_tokens, write_csv, Transfer,
   //read_transactions,
   read_internals,
+  NetTransfers,
 };
 
 /// Command line arguments for the backend tool
@@ -25,12 +26,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     log4rs::init_file("log4rs.yml", Default::default()).expect("failed to init logger");
   
     let mut transfers: Vec<Transfer> = read_tokens("data/ingest/tokens.csv", ADDRESS)?;
-    //transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
     transfers.extend(read_internals("data/ingest/internal.csv", ADDRESS)?);
 
-   //let transactions: Vec<Transaction> = transfers.clone().to_transaction();
-
-   //let net_transfers: Vec<Transfer> = transactions.iter().flat_map(|x| x.net_transfers.clone()).collect();
+    let mut transfers = Transfer::net_transfers(transfers);
+    let transfers = Transfer::populate_usd(&mut transfers);
 
     write_csv(&transfers, "transfers.csv")?;
 

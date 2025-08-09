@@ -19,10 +19,10 @@ impl From<(&str, Token)> for Transfer {
             usd_value = Some(value * stable);
         }
 
-        if let Some(mut usd_value) = usd_value {
-          if event.from.to_lowercase() == address.to_lowercase() {
-            value = value * Decimal::NEGATIVE_ONE;
-            usd_value = usd_value * Decimal::NEGATIVE_ONE;
+        if event.from.to_lowercase() == address.to_lowercase() {
+          value = value * Decimal::NEGATIVE_ONE;
+          if let Some(usd) = usd_value {
+            usd_value = Some(usd * Decimal::NEGATIVE_ONE);
           }
         }
 

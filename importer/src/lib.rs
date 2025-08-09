@@ -20,4 +20,5 @@ pub use ingest::internal::read_internals;
 //pub mod transaction;
 pub mod transfer;
 pub use transfer::NetTransfers;
-//pub mod portfolio;
+pub mod portfolio;
+pub use portfolio::{transfers_to_sales, Sale};

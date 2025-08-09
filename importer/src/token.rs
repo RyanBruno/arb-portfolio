@@ -29,12 +29,10 @@ impl Default for Token {
     /// Produces a placeholder [`Token`] used when no metadata could be resolved.
     fn default() -> Self {
       Self {
-        asset: String::from("Unknown"),
         symbol: String::from("Unknown"),
         address: String::from("Unknown"),
         stable_usd_value: None,
         is_usd: false,
-        is_debt: false,
       }
     }
 }
@@ -51,7 +49,7 @@ impl From<&String> for Token {
       // Iterate over the addresses and check for matches
       match config.get(&address.to_lowercase()) {
         Some(meta) => Token {
-          asset: meta.asset.clone(),
+          //asset: meta.asset.clone(),
           symbol: meta.symbol.clone(),
           address: address.to_string(),
           stable_usd_value: meta
@@ -59,7 +57,7 @@ impl From<&String> for Token {
             .as_ref()
             .map(|x| Decimal::from_str(x).unwrap()),
           is_usd: meta.stable_usd_value.is_some(),
-          is_debt: meta.is_debt,
+          //is_debt: meta.is_debt,
         },
         None => Token {
           address: address.to_string(),

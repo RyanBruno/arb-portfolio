@@ -3,11 +3,10 @@
 use clap::Parser;
 use std::error::Error;
 use arb_portfolio::{
-  read_tokens, write_csv, Transaction, Transfer,
+  read_tokens, write_csv, Transfer,
   //read_transactions,
   read_internals,
 };
-use arb_portfolio::transaction::ToTransaction;
 
 /// Command line arguments for the backend tool
 #[derive(Parser, Debug)]
@@ -29,12 +28,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     //transfers.extend(read_transactions("data/ingest/transactions.csv", ADDRESS)?);
     transfers.extend(read_internals("data/ingest/internal.csv", ADDRESS)?);
 
-   let transactions: Vec<Transaction> = transfers.clone().to_transaction();
+   //let transactions: Vec<Transaction> = transfers.clone().to_transaction();
 
-   let net_transfers: Vec<Transfer> = transactions.iter().flat_map(|x| x.net_transfers.clone()).collect();
+   //let net_transfers: Vec<Transfer> = transactions.iter().flat_map(|x| x.net_transfers.clone()).collect();
 
-    write_csv(&transactions, "transactions.csv")?;
-    write_csv(&net_transfers, "transfers.csv")?;
+    write_csv(&transfers, "transfers.csv")?;
 
     Ok(())
 }

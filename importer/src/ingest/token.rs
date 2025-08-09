@@ -1,6 +1,6 @@
 //! Functions for ingesting token transfer CSVs exported from Etherscan.
 
-use crate::{read_csv, Token as TokenMeta, Transfer, TransferDirection};
+use crate::{read_csv, Token as TokenMeta, Transfer};
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use std::error::Error;
@@ -12,35 +12,26 @@ impl From<(&str, Token)> for Transfer {
 
         let token: TokenMeta = (&event.contract_address).into();
 
-        let value = Decimal::from_str(&event.token_value.replace(",", "")).unwrap();
+        let mut value = Decimal::from_str(&event.token_value.replace(",", "")).unwrap();
         let mut usd_value = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", "")).ok();
 
         if let Some(stable) = token.stable_usd_value {
             usd_value = Some(value * stable);
         }
 
-        let direction = match event.from.to_lowercase() == address.to_lowercase() {
-          true => TransferDirection::Outgoing,
-          false => TransferDirection::Incoming,
-        };
-
-        let counterparty = if event.from.to_lowercase() == address.to_lowercase() {
-            event.to.clone()
-        } else {
-            event.from.clone()
-        };
+        if let Some(mut usd_value) = usd_value {
+          if event.from.to_lowercase() == address.to_lowercase() {
+            value = value * Decimal::NEGATIVE_ONE;
+            usd_value = usd_value * Decimal::NEGATIVE_ONE;
+          }
+        }
 
         Transfer {
             transfer_id: event.transaction_hash,
             datetime: event.datetime_utc.to_string(),
             token,
-            /*asset: asset.asset,
-            address: event.contract_address,
-            symbol: event.token_symbol,*/
             value,
             usd_value,
-            direction,
-            counterparty: vec![counterparty],
         }
     }
 }

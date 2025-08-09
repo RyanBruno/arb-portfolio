@@ -11,18 +11,18 @@ impl From<(&str, Internal)> for Transfer {
     fn from((address, tx): (&str, Internal)) -> Self {
         let (value, counterparty, direction) = match tx.from.to_lowercase() == address.to_lowercase() {
           true => (
-            Decimal::from_str(&tx.value_out_eth).ok(),
+            Decimal::from_str(&tx.value_out_eth).unwrap(),
             tx.tx_to.clone(),
             TransferDirection::Outgoing
           ),
           false => (
-            Decimal::from_str(&tx.value_in_eth).ok(),
+            Decimal::from_str(&tx.value_in_eth).unwrap(),
             tx.from.clone(),
             TransferDirection::Incoming
           ),
         };
-        let usd_value = match (Decimal::from_str(&tx.historical_price_eth), value) {
-          (Ok(price), Some(value)) => Some(price * value),
+        let usd_value = match Decimal::from_str(&tx.historical_price_eth) {
+          Ok(price) => Some(price * value),
           _ => None
         };
 

@@ -12,11 +12,11 @@ impl From<(&str, Token)> for Transfer {
 
         let token: TokenMeta = (&event.contract_address).into();
 
-        let value = Decimal::from_str(&event.token_value.replace(",", "")).ok();
+        let value = Decimal::from_str(&event.token_value.replace(",", "")).unwrap();
         let mut usd_value = Decimal::from_str(&event.usd_value_day_of_tx.replace(",", "").replace("$", "")).ok();
 
-        if let (Some(stable), Some(amount)) = (token.stable_usd_value, value) {
-            usd_value = Some(amount * stable);
+        if let Some(stable) = token.stable_usd_value {
+            usd_value = Some(value * stable);
         }
 
         let direction = match event.from.to_lowercase() == address.to_lowercase() {

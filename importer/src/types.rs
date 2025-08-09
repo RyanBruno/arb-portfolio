@@ -3,6 +3,14 @@
 use serde::Serialize;
 use rust_decimal::Decimal;
 
+#[derive(Default, Debug, Serialize, PartialEq, Clone)]
+pub struct PortfolioItem {
+  /// Token being transferred.
+  pub token: Token,
+  pub cost_basis: Decimal,
+  pub amount: Decimal,
+}
+
 pub struct CostBasisTransfer {
   /// Identifier shared across the underlying transfers.
   pub transfer_id: String,
@@ -107,7 +115,7 @@ pub struct Transaction {
   pub assets: String,
 }
 
-#[derive(Debug, Serialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Clone, PartialEq, Eq, Hash)]
 /// Normalized representation of an ERC-20 token.
 pub struct Token {
   /// Human readable name of the asset.
@@ -144,7 +152,7 @@ pub struct Transfer {
   /// Token being transferred.
   pub token: Token,
   /// Amount of token moved.
-  pub value: Option<Decimal>,
+  pub value: Decimal,
   /// USD value of the transfer at the time of the transaction.
   pub usd_value: Option<Decimal>,
   /// Direction of the transfer.

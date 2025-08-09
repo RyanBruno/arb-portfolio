@@ -11,7 +11,7 @@ mod types;
 pub use types::{
   SwapSubCategory, Token, Transaction, TransactionCategory,
   Transfer, TransferDirection, TwoAssetSwap, SwapDirection,
-  DebtSwap, DebtDirection,
+  DebtSwap, DebtDirection, PortfolioItem
 };
 
 pub mod ingest;
@@ -21,3 +21,4 @@ pub use ingest::internal::read_internals;
 
 pub mod transaction;
 pub mod transfer;
+pub mod portfolio;

@@ -16,8 +16,8 @@ impl TryFrom<&Vec<Transfer>> for DebtSwap {
 
       let debt = transfers.iter().find(|x| x.token.is_debt == true).ok_or("Nope")?;
       let token = transfers.iter().find(|x| x.token.is_debt == false).ok_or("Nope")?;
-      let debt_value = debt.value.ok_or("Nope")?;
-      let value = token.value.ok_or("Nope")?;
+      let debt_value = debt.value;
+      let value = token.value;
 
       Ok(DebtSwap {
         direction: match debt.direction {
@@ -37,38 +37,33 @@ impl TryFrom<&Vec<Transfer>> for TwoAssetSwap {
     fn try_from(transfers: &Vec<Transfer>) -> Result<TwoAssetSwap, &'static str> {
       if transfers.len() != 2 { return Err("Nope"); }
 
-      let sold = transfers.iter().find(|x| x.direction == TransferDirection::Outgoing);
-      let purchased = transfers.iter().find(|x| x.direction == TransferDirection::Incoming);
+      let sold = transfers.iter().find(|x| x.direction == TransferDirection::Outgoing).ok_or("Nope")?;
+      let purchased = transfers.iter().find(|x| x.direction == TransferDirection::Incoming).ok_or("Nope")?;
+      let value_purchased = purchased.value;
+      let value_sold = purchased.value;
 
-      match (sold, purchased) {
-        (Some(sold), Some(purchased)) => match (sold.value, purchased.value) {
-          (Some(value_sold), Some(value_purchased)) => match (sold.usd_value, purchased.usd_value) {
-            (Some(value_sold_usd), Some(value_purchased_usd)) => Ok(TwoAssetSwap {
-              cost_basis: (value_sold_usd + value_purchased_usd) / Decimal::from_str("2").unwrap(),
-              token_purchased: purchased.token.clone(),
-              token_sold: sold.token.clone(),
-              value_purchased,
-              value_sold,
-            }),
-            (Some(cost_basis), _) if sold.token.is_usd => Ok(TwoAssetSwap {
-              cost_basis,
-              token_purchased: purchased.token.clone(),
-              token_sold: sold.token.clone(),
-              value_purchased,
-              value_sold,
-            }),
-            (_, Some(cost_basis)) if purchased.token.is_usd => Ok(TwoAssetSwap {
-              cost_basis,
-              token_purchased: purchased.token.clone(),
-              token_sold: sold.token.clone(),
-              value_purchased,
-              value_sold,
-            }),
-            _ => Err("Nope"),
-          },
-
-          _ => Err("Nope"),
-        },
+      match (sold.usd_value, purchased.usd_value) {
+        (Some(value_sold_usd), Some(value_purchased_usd)) => Ok(TwoAssetSwap {
+          cost_basis: (value_sold_usd + value_purchased_usd) / Decimal::from_str("2").unwrap(),
+          token_purchased: purchased.token.clone(),
+          token_sold: sold.token.clone(),
+          value_purchased,
+          value_sold,
+        }),
+        (Some(cost_basis), _) if sold.token.is_usd => Ok(TwoAssetSwap {
+          cost_basis,
+          token_purchased: purchased.token.clone(),
+          token_sold: sold.token.clone(),
+          value_purchased,
+          value_sold,
+        }),
+        (_, Some(cost_basis)) if purchased.token.is_usd => Ok(TwoAssetSwap {
+          cost_basis,
+          token_purchased: purchased.token.clone(),
+          token_sold: sold.token.clone(),
+          value_purchased,
+          value_sold,
+        }),
         _ => Err("Nope"),
       }
     }

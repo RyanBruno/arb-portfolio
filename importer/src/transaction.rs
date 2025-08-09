@@ -21,7 +21,7 @@ impl Add for Transfer {
           datetime: self.datetime,
           token: self.token,
           counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
-          value: self.value.and_then(|x| other.value.map(|y| x+y)),
+          value: self.value + other.value,
           usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x+y)),
           direction: TransferDirection::Incoming,
         }),
@@ -30,7 +30,7 @@ impl Add for Transfer {
           datetime: self.datetime,
           token: self.token,
           counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
-          value: self.value.and_then(|x| other.value.map(|y| x+y)),
+          value: self.value + other.value,
           usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x+y)),
           direction: TransferDirection::Outgoing,
         }),
@@ -39,7 +39,7 @@ impl Add for Transfer {
           datetime: self.datetime,
           token: self.token,
           counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
-          value: self.value.and_then(|x| other.value.map(|y| x-y)),
+          value: self.value + other.value,
           usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x-y)),
           direction: TransferDirection::Incoming,
         }),
@@ -48,7 +48,7 @@ impl Add for Transfer {
           datetime: self.datetime,
           token: self.token,
           counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
-          value: self.value.and_then(|x| other.value.map(|y| x-y)),
+          value: self.value + other.value,
           usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| x-y)),
           direction: TransferDirection::Outgoing,
         }),
@@ -57,7 +57,7 @@ impl Add for Transfer {
           datetime: self.datetime,
           token: self.token,
           counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
-          value: self.value.and_then(|x| other.value.map(|y| y-x)),
+          value: self.value + other.value,
           usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| y-x)),
           direction: TransferDirection::Outgoing,
         }),
@@ -66,7 +66,7 @@ impl Add for Transfer {
           datetime: self.datetime,
           token: self.token,
           counterparty: self.counterparty.into_iter().chain(other.counterparty).collect(),
-          value: self.value.and_then(|x| other.value.map(|y| y-x)),
+          value: self.value + other.value,
           usd_value: self.usd_value.and_then(|x| other.usd_value.map(|y| y-x)),
           direction: TransferDirection::Incoming,
         }),
@@ -130,7 +130,7 @@ impl ToTransaction for Vec<Transfer> {
           .into_values()
           .map(|mut transaction| {
               transaction.net_transfers.retain(|t| {
-                  t.value.unwrap_or_default() != Decimal::ZERO
+                  t.value != Decimal::ZERO
               });
               transaction.assets = transaction.net_transfers.iter().map(|x| x.token.symbol.clone()).collect::<Vec<String>>().join("|");
               transaction.category = (&transaction.net_transfers).into();
